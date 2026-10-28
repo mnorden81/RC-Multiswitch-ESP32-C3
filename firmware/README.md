@@ -1,4 +1,4 @@
-# Firmware RC-Multiswitch v4.06
+# Firmware RC-Multiswitch v4.07
 
 Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis ist MultiSwitch_ESP32_V3 v3.12. Spezifikation: `docs/Firmware-Spezifikation.md`.
 
@@ -12,7 +12,7 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
 
 ## Funktionen
 - Alle Funktionen der V3 (Konfig 1/2/3 je Ausgang, MKan1/MKan2, Web-UI, Lua, Failsafe, NVS, OTA, JSON-Export/-Import).
-- UART A (CN1): CRSF (RC-System 4) oder SBUS (RC-System 0-3) vom Empfaenger.
+- UART A (CN1): CRSF (RC-System 4, Werkseinstellung ab v4.07) oder SBUS (RC-System 0-3) vom Empfaenger.
 - C3: Ausgang 7/8 nur digital (an ab 50 %), Ausgang 1-6 PWM. S3: alle 8 PWM.
 - **UART B/C mit waehlbarer Rolle (ab v4.04):** UART B (C3 und S3) und UART C (nur S3) koennen im Lua-Menue (Ordner "UART B/C") oder in der Web-UI (RC-Tab) auf Aus, CRSF, S.Port, GPS oder Raw (ab v4.05) gestellt werden, wie beim Soundmodul. Ab v4.05 hat jeder UART eine eigene Baudrate (Lua-Felder 84/85, vorher 84 = GPS-Baudrate); beim Wechsel der Rolle wird die passende Baudrate gesetzt. Wirkt nach einem Neustart. Werkseinstellung: CRSF auf beiden.
   - CRSF: Modulkette zum naechsten Modul (siehe unten), nur bei RC-System CRSF.
@@ -32,8 +32,8 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
 - Frames gehen ganz und unveraendert weiter (CRC geprueft). Je Port eine Warteschlange mit 8 Frames; bei Ueberlauf werden zuerst alte RC-Kanal-Frames verworfen.
 
 ## Stand
-- v4.04 kompiliert fuer C3 und S3 (CI). v4.02: CRSF-Link-Statistik (LQ) korrigiert. v4.03: SBUS-Zeitlimit 10 s (ohne Frames gehen die Ausgaenge aus). v4.04: Rolle von UART B/C waehlbar (CRSF, S.Port, GPS). v4.05: gemeinsame Basis RC_Common (CRSF-Bibliothek 1.1.0 mit korrekter Command-CRC, Lua-Menue als Tabelle, gemeinsame NVS-Schluessel mit Uebernahme der alten Werte, Baudrate je UART, Rolle Raw). v4.06: Einstellungs-Backup im Flash des Moduls (Web-UI, Karte „Konfiguration sichern“), automatisch vor Import und OTA (RC_Common 1.2.0, Partitionsschema mit SPIFFS). Noch nicht auf Hardware getestet.
-- Offen: Abnahmetest nach Kapitel 8 der Spezifikation (1, 2 und 3 Module).
+- v4.04 kompiliert fuer C3 und S3 (CI). v4.02: CRSF-Link-Statistik (LQ) korrigiert. v4.03: SBUS-Zeitlimit 10 s (ohne Frames gehen die Ausgaenge aus). v4.04: Rolle von UART B/C waehlbar (CRSF, S.Port, GPS). v4.05: gemeinsame Basis RC_Common (CRSF-Bibliothek 1.1.0 mit korrekter Command-CRC, Lua-Menue als Tabelle, gemeinsame NVS-Schluessel mit Uebernahme der alten Werte, Baudrate je UART, Rolle Raw). v4.06: Einstellungs-Backup im Flash des Moduls (Web-UI, Karte „Konfiguration sichern“), automatisch vor Import und OTA (RC_Common 1.2.0, Partitionsschema mit SPIFFS). v4.07: Werkseinstellung RC-System CRSF statt SBUS, Lua zeigt die richtige Version. Noch nicht auf Hardware getestet.
+- Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
 IO2 muss beim Einschalten HIGH sein, damit der ESP32-C3 normal startet. Auf der Platine haengen an IO2 (Ausgang 3) die Kontroll-LED LED3 mit R3 nach GND und der Eingang des ULN2803A. Beides kann IO2 beim Reset nach LOW ziehen, der C3 startet dann evtl. nicht oder nur unzuverlaessig. Die Platine bleibt bewusst so (bereits bestellt, Stand 21.10.2026).

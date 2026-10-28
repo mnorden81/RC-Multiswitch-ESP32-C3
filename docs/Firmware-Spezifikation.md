@@ -146,14 +146,7 @@ Die Status-LED zeigt den CRSF-Linkzustand. Ausgangsbasis ist das V3-Verhalten; d
 
 ## 8. Abnahme-Checkliste
 
-1. Kompiliert für C3 und S3 (je ein Build-Ziel) ohne Warnungen in neuen Teilen.
-2. Einzelmodul am Empfänger: Kanäle schalten, LEDs folgen, Failsafe nach 2 s.
-3. Zwei und drei Module in Kette: Alle erscheinen im Lua-Geräte-Menü; Konfiguration eines Moduls hinten in der Kette ändert nur dieses.
-4. RC-Channels erreichen alle Module; Latenz-Messung über die Kette (≤ wenige ms je Modul).
-5. Keine Frames B ↔ C; keine Endlosschleife; keine Verfälschung der Frames (CRC beim Nachbarn gültig).
-6. BOOT-Langdruck schaltet AP; Kurzdruck/Reset löst keine falsche Aktion aus; Boot in Download-Modus nur bei gedrücktem Taster beim Reset.
-7. Status-LED zeigt Muster nach Tabelle (S3); C3 ohne LED-Funktion, UART B unbeeinträchtigt.
-8. OTA, JSON-Export/-Import, NVS-Kompatibilität mit V3-Konfig.
+Die ausfuehrliche Pruefliste fuer ein fertig gebautes Modul (Versorgung, Booten, C3-IO2, Empfang, Ausgaenge, WLAN/Web-UI, Lua, UART B/C, Modulkette, Sichern/OTA) steht in [Abnahmepruefung.md](Abnahmepruefung.md).
 
 
 ## 9. Annahmen und offene Punkte

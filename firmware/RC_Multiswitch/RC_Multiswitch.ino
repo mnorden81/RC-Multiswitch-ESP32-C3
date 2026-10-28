@@ -1,5 +1,5 @@
 /*
-    RC-Multiswitch  v4.06  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
+    RC-Multiswitch  v4.07  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
    v4.00 abgezweigt von ESP32-MultiSwitch v3.12 (Repo ESP32-Multiswitch-
    CRSF-bidirektional, MultiSwitch_ESP32_V3). Gleicher Quellcode fuer beide
    Platinen, Board-Auswahl in board_config.h.
@@ -31,6 +31,12 @@
    3 = HoTT           (SBUS)
    4 = CRSF           (ExpressLRS / TBS CrossFire, bidirektional)
  Lua-Konfiguration und (ab Schritt 3) Modulkette gibt es nur bei CRSF.
+
+ ÄNDERUNGEN v4.07:
+   - Werkseinstellung RC-System jetzt 4 = CRSF (vorher 0 = FrSky SBUS).
+     Gilt fuer neue Module und nach "Werkseinstellungen"; gespeicherte
+     Einstellungen bestehender Module bleiben unveraendert.
+   - FIX: Lua-Feld "Version" zeigte fest "v4.05", jetzt aus Version.
 
  ÄNDERUNGEN v4.06 (RC_Common 1.2.0):
    - NEU: Einstellungs-Backup im Flash des Moduls (Tab WLAN, Karte
@@ -302,7 +308,7 @@
 #include "src/RC_Common/web_common.h"
 #include "src/RC_Common/config_backup.h"   // v4.06
 
-constexpr uint16_t Version = 406; // 4.06 - CRSF Parameter Version Number
+constexpr uint16_t Version = 407; // 4.07 - CRSF Parameter Version Number
 
 // ======== SBUS-Schwellen (benannte Konstanten) ==================
 static constexpr uint16_t SBUS_LOW_THRESHOLD  =  800;
@@ -406,7 +412,7 @@ unsigned long lastCrsfPacket = 0;
 uint8_t wm_prop_value[8] = {255, 255, 255, 255, 255, 255, 255, 255};
 
 // ======== Konfiguration (aus NVS) ===============================
-int RC_System      = 0;
+int RC_System      = 4;   // v4.07: Werkseinstellung CRSF (vorher 0 = FrSky SBUS)
 int einkanal_mode  = 0;
 int CRSF_Channel   = 4;
 int modul_adress   = 0;
@@ -569,7 +575,7 @@ static void nvsLoad() {
     Preferences p;
     p.begin("msw", true);
     if (!p.isKey("rc_sys")) { p.end(); return; }
-    RC_System     = p.getInt("rc_sys",  0);
+    RC_System     = p.getInt("rc_sys",  4);
     CRSF_Channel  = p.getInt("crsf_ch", 4);
     einkanal_mode = p.getInt("ek_mode", 0);
     for (int g = 0; g < MULTISW_NUM_GROUPS; g++) {
@@ -614,7 +620,7 @@ static void nvsLoad() {
 }
 
 static void nvsReset() {
-    RC_System = 0; CRSF_Channel = 4; einkanal_mode = 0; modul_adress = 0;
+    RC_System = 4; CRSF_Channel = 4; einkanal_mode = 0; modul_adress = 0;
     for (int g = 0; g < MULTISW_NUM_GROUPS; g++) {
         EK_Gruppen_Adresse[g] = 255; SBUS_Gruppen_Channel[g] = 999; SBUS_Gruppen_Mode[g] = 0;
     }
@@ -997,7 +1003,10 @@ static void buildLuaMenu() {
     LuaMenu& m = luaMenu;
     m.clear();
     m.folder(0, 0, "");
-    m.info(1, 0, "Version", "v4.05 " BOARD_NAME);
+    // v4.07: Text aus Version, damit er nicht mehr veraltet (stand auf v4.05)
+    static char luaVersionText[16];
+    snprintf(luaVersionText, sizeof(luaVersionText), "v%d.%02d %s", Version / 100, Version % 100, BOARD_NAME);
+    m.info(1, 0, "Version", luaVersionText);
     m.folder(2, 0, "Global");
     m.u8(3, 2, "Switch Addr", 0, 20, "", luaGetAddr, luaSetAddr);
     m.u8(4, 2, "CRSF Kanal", 0, 15, "", luaGetCrsfCh, luaSetCrsfCh);
