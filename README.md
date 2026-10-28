@@ -9,6 +9,7 @@ Kleiner, guenstiger Multiswitch fuer RC-Modelle: Der ESP32-C3 empfaengt CRSF vom
 Dokumente:
 - [docs/Projektbeschreibung.docx](docs/Projektbeschreibung.docx): Projektbeschreibung
 - [docs/Hardware-Beschreibung_C3_S3.docx](docs/Hardware-Beschreibung_C3_S3.docx): Hardware-Beschreibung C3 und S3 (Stecker, Kanalzuordnung, Stueckliste, Dimensionierung)
+- [docs/Abnahmepruefung.md](docs/Abnahmepruefung.md): Abnahmepruefung (Pruefliste fuer ein fertig gebautes Modul)
 - [docs/Firmware-Spezifikation.md](docs/Firmware-Spezifikation.md) (auch als DOCX): Firmware-Spezifikation (Basis V3, Router fuer Modulketten, BOOT-Taster, Status-LED)
 
 ## Merkmale
@@ -44,21 +45,21 @@ Board: ESP32-C3 SuperMini
 - **Risiko IO2 (Ausgang 3):** IO2 ist ein Strapping-Pin und muss beim Einschalten HIGH sein. LED3/R3 und der ULN2803A-Eingang koennen ihn nach LOW ziehen, der C3 startet dann evtl. nicht sicher. Die Platine bleibt so (bereits bestellt). Beim ersten Aufbau mehrmals ein- und ausschalten; Abhilfe siehe [firmware/README.md](firmware/README.md#bekanntes-risiko-c3-io2-ausgang-3-ist-ein-strapping-pin).
 - Footprint ESP32-C3-SuperMini_THT ist eine eigene Zeichnung (2x8, 2,54 mm, Reihenabstand 15,24 mm). Vor der Fertigung 1:1 am echten Board pruefen.
 
-## Firmware (v4.06)
+## Firmware (v4.07)
 - Arduino-Sketch `firmware/RC_Multiswitch`, gleicher Quellcode fuer C3 und S3 (Board wird automatisch erkannt). Basis: MultiSwitch_ESP32_V3 v3.12.
-- CRSF auf UART A, wahlweise SBUS. UART B (und UART C beim S3) per Lua oder Web-UI auf Aus, CRSF (Modulkette), S.Port, GPS oder Raw einstellbar, mit eigener Baudrate je UART. Beim GPS sucht die Baudrate „Auto“ (Vorgabe) die Rate selbst und stellt das GPS auf 115200 Baud und 10 Hz um, wie bei Betaflight. In der Modulkette ist jedes Modul mit eigener Adresse ueber Lua einzeln einstellbar.
+- CRSF auf UART A (Werkseinstellung ab v4.07), wahlweise SBUS. UART B (und UART C beim S3) per Lua oder Web-UI auf Aus, CRSF (Modulkette), S.Port, GPS oder Raw einstellbar, mit eigener Baudrate je UART. Beim GPS sucht die Baudrate „Auto“ (Vorgabe) die Rate selbst und stellt das GPS auf 115200 Baud und 10 Hz um, wie bei Betaflight. In der Modulkette ist jedes Modul mit eigener Adresse ueber Lua einzeln einstellbar.
 - Gemeinsame Basis aller ESP32-Module seit v4.05: `firmware/RC_Multiswitch/src/RC_Common/` (CRSF-Bibliothek mit Router, UART-Rollen, Lua-Menue, NVS, WLAN-Failsafe, Status-LED, OTA), siehe deren README.
 - BOOT-Taster 3 s: WLAN-AP ein/aus. Status-LED nur beim S3.
 - Details und Bauanleitung: [firmware/README.md](firmware/README.md).
 
 ## Ordner
 - `hardware/`: KiCad-Projekt (Schaltplan, PCB, PDF, eigene Footprints, fp-lib-table). Entwurfsnotizen in [hardware/README-hardware.md](hardware/README-hardware.md).
-- `firmware/`: Firmware v4.06 (Arduino-Sketch).
+- `firmware/`: Firmware v4.07 (Arduino-Sketch).
 - `docs/`: Projektbeschreibung, Hardware-Beschreibung und Firmware-Spezifikation.
 
 ## Stand
 - Hardware: Schaltplan und PCB vorhanden. ERC/DRC noch in KiCad ausfuehren.
-- Firmware: v4.06 kompiliert fuer C3 und S3, noch nicht auf Hardware getestet.
+- Firmware: v4.07 kompiliert fuer C3 und S3, noch nicht auf Hardware getestet.
 
 ## Offene Punkte
 - Pad-Namen und Footprint am realen Board pruefen
