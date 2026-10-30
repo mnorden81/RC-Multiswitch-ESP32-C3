@@ -5,7 +5,7 @@
 	(uuid "0f0fc713-9c7c-45b9-9629-0d42632ffdae")
 	(paper "A4")
 	(title_block
-		(title "RC Multiswitch ESP32-C3 SuperMini (ULN2803A, negativ schaltend)")
+		(title "RC Multiswitch ESP32-C3 SuperMini (TBD62083APG, negativ schaltend)")
 		(date "2026-10-14")
 		(rev "v0.3")
 		(comment 1 "Entwurf - vor Layout/Bestellung pruefen")
@@ -459,7 +459,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Transistor_Array:ULN2803A"
+		(symbol "local:TBD62083APG"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -471,7 +471,7 @@
 					)
 				)
 			)
-			(property "Value" "ULN2803A"
+			(property "Value" "TBD62083APG"
 				(at 0 11.43 0)
 				(effects
 					(font
@@ -489,7 +489,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/uln2803a.pdf"
+			(property "Datasheet" "https://toshiba.semicon-storage.com/info/TBD62083APG_datasheet_en_20160803.pdf"
 				(at 2.54 -5.08 0)
 				(effects
 					(font
@@ -498,7 +498,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Darlington Transistor Arrays, SOIC18/DIP18"
+			(property "Description" "8-ch DMOS sink driver (low-side), 50V 500mA, DIP18, pin-compatible with ULN2803A"
 				(at 0 0 0)
 				(effects
 					(font
@@ -507,7 +507,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "Darlington transistor array"
+			(property "ki_keywords" "sink driver low-side DMOS array"
 				(at 0 0 0)
 				(effects
 					(font
@@ -525,7 +525,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "ULN2803A_0_1"
+			(symbol "TBD62083APG_0_1"
 				(rectangle
 					(start -7.62 -15.24)
 					(end 7.62 10.16)
@@ -665,7 +665,7 @@
 					)
 				)
 			)
-			(symbol "ULN2803A_1_1"
+			(symbol "TBD62083APG_1_1"
 				(pin input line
 					(at -10.16 5.08 0)
 					(length 2.54)
@@ -2637,7 +2637,7 @@
 		)
 		(uuid "e0c8e32d-29d9-48af-b0e2-661f7778ed71")
 	)
-	(text "ESP32-C3 SuperMini Multiswitch: 8 Kanaele (ULN2803A) + CRSF  -  Entwurf v0.3"
+	(text "ESP32-C3 SuperMini Multiswitch: 8 Kanaele (TBD62083APG) + CRSF  -  Entwurf v0.3"
 		(exclude_from_sim no)
 		(at 15 14 0)
 		(effects
@@ -6952,7 +6952,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Transistor_Array:ULN2803A")
+		(lib_id "local:TBD62083APG")
 		(at 165.1 101.6 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6968,7 +6968,7 @@
 				)
 			)
 		)
-		(property "Value" "ULN2803A"
+		(property "Value" "TBD62083APG"
 			(at 165.1 122.88 0)
 			(effects
 				(font

@@ -4,7 +4,7 @@ RC-Multiswitch mit 8 Schaltkanaelen auf einem ESP32-C3 SuperMini.
 
 Frueher `CRSF-Multiswitch-ESP32-C3`. Der neue Name ist neutral, weil der Multiswitch neben CRSF auch SBUS (UART A) als Eingang versteht.
 
-Kleiner, guenstiger Multiswitch fuer RC-Modelle: Der ESP32-C3 empfaengt CRSF vom Empfaenger und schaltet ueber einen ULN2803A bis zu 8 Verbraucher (Licht, Relais, Funktionen). Das Layout folgt dem CRSF Multiswitch THT v1.1, alle Bauteile ausser den JST-GH-Buchsen sind bedrahtet.
+Kleiner, guenstiger Multiswitch fuer RC-Modelle: Der ESP32-C3 empfaengt CRSF vom Empfaenger und schaltet ueber einen TBD62083APG (Nachfolger des ULN2803A) bis zu 8 Verbraucher (Licht, Relais, Funktionen). Das Layout folgt dem CRSF Multiswitch THT v1.1, alle Bauteile ausser den JST-GH-Buchsen sind bedrahtet.
 
 Dokumente:
 - [docs/Projektbeschreibung.docx](docs/Projektbeschreibung.docx): Projektbeschreibung
@@ -13,7 +13,7 @@ Dokumente:
 - [docs/Firmware-Spezifikation.md](docs/Firmware-Spezifikation.md) (auch als DOCX): Firmware-Spezifikation (Basis V3, Router fuer Modulketten, BOOT-Taster, Status-LED)
 
 ## Merkmale
-- 8 Schaltkanaele ueber ULN2803A, Kontroll-LED je Kanal
+- 8 Schaltkanaele ueber TBD62083APG (negativ) oder TBD62783APG (positiv), Kontroll-LED je Kanal
 - UART A (Eingang vom Empfaenger) und UART B (Rolle waehlbar: Modulkette CRSF, S.Port-LiPo-Sensoren oder GPS)
 - Versorgung des ESP32 aus +5 V des Empfaengers, Last getrennt mit 5-12 V
 - Eigener THT-Footprint fuer den SuperMini im Projekt
@@ -22,8 +22,8 @@ Dokumente:
 Board: ESP32-C3 SuperMini
 
 - Lastspannung 5-12 V (VLOAD) an CN2 (JST PH 2), TVS-Diode P6KE18A als Schutz.
-- Treiber ULN2803A, 8 Kanaele, max. 500 mA je Kanal (Verlustleistung des ULN2803A bei mehreren Kanaelen beachten).
-- R9-R16 (THT 1/4 W) zwischen ULN-Ausgang und Stiftleiste J1: kein Wert vorgegeben, der Anwender legt sie passend zu Verbraucher und Lastspannung aus.
+- Treiber TBD62083APG (DMOS, Nachfolger des ULN2803A, gleiche Pinbelegung; ein ULN2803A passt weiterhin in den Sockel), 8 Kanaele, max. 500 mA je Kanal, Summe aller Kanaele ca. 1,5 A. Spannungsabfall am Ausgang nur ca. 0,2-0,4 V statt ca. 1 V beim ULN2803A. Positiv schaltende Variante mit TBD62783APG siehe [hardware/README-hardware.md](hardware/README-hardware.md).
+- R9-R16 (THT 1/4 W) zwischen Treiber-Ausgang und Stiftleiste J1: kein Wert vorgegeben, der Anwender legt sie passend zu Verbraucher und Lastspannung aus.
 - R1-R8 und LED1-LED8 (3 mm) als Kontroll-LED je Kanal, vom Steuersignal Sn gegen GND. Werte legt der Anwender fest, eine Empfehlung ist auf der Platine aufgedruckt.
 - Keine Pulldowns und keine Widerstaende in den UART-Leitungen. Der ESP32 wird aus +5 V von CN1 (BEC/Empfaenger) versorgt.
 
@@ -42,7 +42,7 @@ Board: ESP32-C3 SuperMini
 
 ### Hinweise
 - IO8 haengt beim SuperMini an der Onboard-LED, IO9 am BOOT-Taster. UART B RX liegt auf IO8.
-- **Risiko IO2 (Ausgang 3):** IO2 ist ein Strapping-Pin und muss beim Einschalten HIGH sein. LED3/R3 und der ULN2803A-Eingang koennen ihn nach LOW ziehen, der C3 startet dann evtl. nicht sicher. Die Platine bleibt so (bereits bestellt). Beim ersten Aufbau mehrmals ein- und ausschalten; Abhilfe siehe [firmware/README.md](firmware/README.md#bekanntes-risiko-c3-io2-ausgang-3-ist-ein-strapping-pin).
+- **Risiko IO2 (Ausgang 3):** IO2 ist ein Strapping-Pin und muss beim Einschalten HIGH sein. LED3/R3 und der Treiber-Eingang koennen ihn nach LOW ziehen, der C3 startet dann evtl. nicht sicher. Die Platine bleibt so (bereits bestellt). Beim ersten Aufbau mehrmals ein- und ausschalten; Abhilfe siehe [firmware/README.md](firmware/README.md#bekanntes-risiko-c3-io2-ausgang-3-ist-ein-strapping-pin).
 - Footprint ESP32-C3-SuperMini_THT ist eine eigene Zeichnung (2x8, 2,54 mm, Reihenabstand 15,24 mm). Vor der Fertigung 1:1 am echten Board pruefen.
 
 ## Firmware (v4.07)
@@ -63,6 +63,6 @@ Board: ESP32-C3 SuperMini
 
 ## Offene Punkte
 - Pad-Namen und Footprint am realen Board pruefen
-- Verlustleistung des ULN2803A bei mehreren Kanaelen mit 500 mA pruefen
+- Erwaermung des Treibers bei mehreren Kanaelen mit 500 mA pruefen
 - Firmware auf Hardware testen (Einzelmodul und Kette mit 2-3 Modulen)
 - IO2-Strapping (Ausgang 3) beim ersten Aufbau pruefen

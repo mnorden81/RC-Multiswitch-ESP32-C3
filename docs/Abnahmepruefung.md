@@ -36,8 +36,8 @@ Alles ohne Versorgung, ESP-Board noch ohne USB.
 
 | Nr | Prüfung | Erwartet | OK | Notiz |
 | --- | --- | --- | --- | --- |
-| 2.1 | Lötstellen ansehen (Lupe), besonders ESP-Stiftleisten, ULN2803A, JST-GH-Buchsen | keine Brücken, keine kalten Lötstellen | ☐ | |
-| 2.2 | Einbaurichtung prüfen: ULN2803A (Kerbe), LED1-8, TVS P6KE18A (Ring) | wie Bestückungsdruck | ☐ | |
+| 2.1 | Lötstellen ansehen (Lupe), besonders ESP-Stiftleisten, Treiber-Sockel U2, JST-GH-Buchsen | keine Brücken, keine kalten Lötstellen | ☐ | |
+| 2.2 | Einbaurichtung prüfen: Treiber U2 (Kerbe; NEG: TBD62083APG oder ULN2803A, POS: TBD62783APG), LED1-8, TVS P6KE18A (Ring) | wie Bestückungsdruck | ☐ | |
 | 2.3 | Durchgang +5 V gegen GND an CN1 (Pin 2 gegen Pin 1) | kein Kurzschluss (mehr als ca. 100 Ω) | ☐ | |
 | 2.4 | Durchgang VLOAD gegen GND an CN2 | kein Kurzschluss | ☐ | |
 | 2.5 | Durchgang VLOAD gegen +5 V | keine Verbindung, die zwei Netze sind getrennt | ☐ | |
@@ -77,7 +77,7 @@ Wichtig: Ab Werk steht das RC-System auf CRSF (seit v4.07). Ein Modul mit älter
 
 ### 4a. Nur C3: Strapping-Pin IO2 (Ausgang 3)
 
-IO2 muss beim Einschalten HIGH sein. LED3/R3 und der ULN-Eingang ziehen ihn nach LOW, dann startet der C3 evtl. nicht. Die Platine bleibt so (Entscheidung 21.10.). Erkennen kannst du einen erfolgreichen Start am WLAN „MultiSwitch“.
+IO2 muss beim Einschalten HIGH sein. LED3/R3 und der Treiber-Eingang ziehen ihn nach LOW, dann startet der C3 evtl. nicht. Die Platine bleibt so (Entscheidung 21.10.). Erkennen kannst du einen erfolgreichen Start am WLAN „MultiSwitch“.
 
 | Nr | Prüfung | Erwartet | OK | Notiz |
 | --- | --- | --- | --- | --- |
@@ -144,7 +144,7 @@ VLOAD an CN2 (z. B. 12 V), an jedem Ausgang von J1 ein Testverbraucher. Einschal
 | 7.4 | Ausgang 1: PWM Festwert 64 | Last deutlich dunkler als bei 255 | ☐ | |
 | 7.5 | nur C3: Ausgang 7 und 8 mit PWM Festwert 64 und 200 | 64 = aus, 200 = voll an (nur digital, an ab 50 %) | ☐ | |
 | 7.6 | nur S3: Ausgang 7 und 8 mit PWM Festwert 64 | gedimmt wie die anderen | ☐ | |
-| 7.7 | Ein Ausgang mit ca. 300-500 mA Last, 5 min an | ULN2803A handwarm, nicht heiß; Spannung am Ausgang unter ca. 1,2 V | ☐ | ___ mA / ___ V |
+| 7.7 | Ein Ausgang mit ca. 300-500 mA Last, 5 min an | Treiber handwarm, nicht heiß; Spannung am Ausgang (NEG gegen GND) unter ca. 0,5 V mit TBD62083APG bzw. 1,2 V mit ULN2803A | ☐ | ___ mA / ___ V |
 | 7.8 | Strom an CN2 mit allen 8 Ausgängen an messen | unter ca. 2 A (Grenze JST-PH-Kontakt) | ☐ | ___ A |
 
 ## 8. Lua-Menü am Sender

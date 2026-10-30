@@ -36,7 +36,7 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
 - Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
-IO2 muss beim Einschalten HIGH sein, damit der ESP32-C3 normal startet. Auf der Platine haengen an IO2 (Ausgang 3) die Kontroll-LED LED3 mit R3 nach GND und der Eingang des ULN2803A. Beides kann IO2 beim Reset nach LOW ziehen, der C3 startet dann evtl. nicht oder nur unzuverlaessig. Die Platine bleibt bewusst so (bereits bestellt, Stand 21.10.2026).
+IO2 muss beim Einschalten HIGH sein, damit der ESP32-C3 normal startet. Auf der Platine haengen an IO2 (Ausgang 3) die Kontroll-LED LED3 mit R3 nach GND und der Eingang des Treibers (TBD62083APG bzw. ULN2803A). Beides kann IO2 beim Reset nach LOW ziehen, der C3 startet dann evtl. nicht oder nur unzuverlaessig. Die Platine bleibt bewusst so (bereits bestellt, Stand 21.10.2026).
 - Beim ersten Aufbau pruefen: mehrmals aus- und einschalten, mit und ohne Last an Ausgang 3.
 - Startet der C3 nicht sicher: R3 hochohmiger waehlen (z. B. 10 kOhm) oder LED3/R3 weglassen; als letzte Moeglichkeit einen 10-kOhm-Pull-up von IO2 nach 3V3 nachruesten.
 - Der S3 ist nicht betroffen.
