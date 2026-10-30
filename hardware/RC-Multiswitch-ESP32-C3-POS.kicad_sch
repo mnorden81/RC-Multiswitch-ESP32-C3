@@ -2422,7 +2422,7 @@
 		)
 		(uuid "496454b3-5ef4-443e-81e9-004a6a556930")
 	)
-	(text "Last: 5-12V, Verbraucher zwischen OUTn und GND. Max. 500mA je Kanal, Summe aller Kanaele max. ca. 1,5A. NICHT mit ULN2803 bestuecken (Pin 9/10 anders). ESP32 wird aus +5V von CN1 (BEC/Empfaenger) versorgt. Adresse per Firmware/Web-UI/Lua. Keine Pulldowns, keine UART-Vorwiderstaende. R1-R16: Werte legt der Anwender je LED bzw. Verbraucher selbst aus (siehe Projektbeschreibung)."
+	(text "Last: 5-12V, Verbraucher zwischen OUTn und GND. Max. 500mA je Kanal, Summe aller Kanaele max. ca. 1,5A. NICHT mit ULN2803A/TBD62083APG bestuecken (Pin 9/10 anders). ESP32 wird aus +5V von CN1 (BEC/Empfaenger) versorgt. Adresse per Firmware/Web-UI/Lua. Keine Pulldowns, keine UART-Vorwiderstaende. R1-R16: Werte legt der Anwender je LED bzw. Verbraucher selbst aus (siehe Projektbeschreibung)."
 		(exclude_from_sim no)
 		(at 15 21 0)
 		(effects
