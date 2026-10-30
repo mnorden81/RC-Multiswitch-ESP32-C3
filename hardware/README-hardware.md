@@ -15,3 +15,12 @@ Zu pruefen: Pad-Namen am realen Board, ULN2803A-Verlustleistung bei mehreren Kan
 - Symbol-Pads = Pad-Nummern des Boards laut mrtnvgr/KiCad_ESP32-C3-SuperMini (rechte Reihe 1..8 von unten: IO0-IO4, 3V3, GND, 5V; linke Reihe 9..16 von oben: IO5-IO10, IO20, IO21).
 - Footprint `footprints.pretty/ESP32-C3-SuperMini_THT` (eigene Zeichnung, 2x8, Raster 2,54 mm, Reihenabstand 15,24 mm, USB oben). Bindung per `fp-lib-table` im Projekt. Vor dem Layout 1:1 am echten Board pruefen.
 - IO8 haengt beim SuperMini an der Onboard-LED, IO9 am BOOT-Taster (UART B RX = IO8 beachten).
+
+## Varianten negativ / positiv schaltend (2026-10-30)
+Im Ordner `hardware` liegen neben dem Original zwei eigene KiCad-Projekte:
+- `RC-Multiswitch-ESP32-C3-NEG`: negativ schaltend mit ULN2803A, Schaltplan und Platine 1:1 wie das Original. Verbraucher zwischen VLOAD (J1 gerade Pins, "+") und OUTn.
+- `RC-Multiswitch-ESP32-C3-POS`: positiv schaltend mit TBD62783APG (DMOS-Quellentreiber, pinkompatibel zu UDN2981). Verbraucher zwischen OUTn (J1 ungerade Pins, "+") und GND (J1 gerade Pins, "-").
+  - U2 Pin 9 = VCC an VLOAD, Pin 10 = GND (genau umgekehrt wie beim ULN2803A). NICHT mit ULN2803A bestuecken.
+  - Spannungsabfall am Ausgang nur ca. 0,2-0,5 V, daher auch mit VLOAD 5 V brauchbar. Max. 500 mA je Kanal, Summe aller Kanaele max. ca. 1,5 A.
+  - Gegenueber NEG geaendert: Netze an U2 Pin 9/10 und an der J1-Schiene, drei Leiterbahnen an U2, Bestueckungsdruck an U2 und J1.
+- Werte aus dem Datenblatt-Gedaechtnis, vor der Bestellung im TBD62783APG-Datenblatt pruefen. NEG/POS noch ohne ERC/DRC in KiCad und ungetestet.
