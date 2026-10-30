@@ -53,7 +53,7 @@ Board: ESP32-C3 SuperMini
 - Details und Bauanleitung: [firmware/README.md](firmware/README.md).
 
 ## Ordner
-- `hardware/`: KiCad-Projekt (Schaltplan, PCB, PDF, eigene Footprints, fp-lib-table). Entwurfsnotizen in [hardware/README-hardware.md](hardware/README-hardware.md).
+- `hardware/`: KiCad-Projekt (Schaltplan, PCB, PDF, eigene Footprints, fp-lib-table). Entwurfsnotizen in [hardware/README-hardware.md](hardware/README-hardware.md). 3D-druckbares Gehaeuse (stehende oder gewinkelte Stiftleiste) in [hardware/gehaeuse/](hardware/gehaeuse/README.md).
 - `firmware/`: Firmware v4.07 (Arduino-Sketch).
 - `docs/`: Projektbeschreibung, Hardware-Beschreibung und Firmware-Spezifikation.
 
