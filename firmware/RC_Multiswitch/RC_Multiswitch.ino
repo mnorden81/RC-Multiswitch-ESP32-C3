@@ -1,5 +1,5 @@
 /*
-    RC-Multiswitch  v4.07  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
+    RC-Multiswitch  v4.09  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
    v4.00 abgezweigt von ESP32-MultiSwitch v3.12 (Repo ESP32-Multiswitch-
    CRSF-bidirektional, MultiSwitch_ESP32_V3). Gleicher Quellcode fuer beide
    Platinen, Board-Auswahl in board_config.h.
@@ -31,6 +31,17 @@
    3 = HoTT           (SBUS)
    4 = CRSF           (ExpressLRS / TBS CrossFire, bidirektional)
  Lua-Konfiguration und (ab Schritt 3) Modulkette gibt es nur bei CRSF.
+
+ ÄNDERUNGEN v4.09 (RC_Common 1.3.0, Lua wie RC-Multiswitch-Sound v1.05):
+   - FIX: Lange Lua-Auswahlfelder (Ausgang-Quelle, UART-Baudrate) kommen
+     Chunk fuer Chunk wie vom Sender angefragt. Vorher zeigte das ELRS-Lua
+     ihren Wert nicht oder unvollstaendig.
+   - Ordnernamen zeigen den aktuellen Wert: "Ausgang 1 (Kanal_L 5)",
+     "Global (Adr 0)", "UART B/C (GPS, Aus)".
+   - Felder ohne Wirkung werden ausgeblendet (Feld-IDs bleiben): Global
+     "SBUS EK Kanal" (vorher "CRSF Kanal", wirkt nur bei SBUS), Blinkzeiten
+     bei Dauerlicht, PWM Festwert bei MWprop, Baudrate bei UART "Aus",
+     beim C3 die UART-C-Zeilen.
 
  ÄNDERUNGEN v4.07:
    - Werkseinstellung RC-System jetzt 4 = CRSF (vorher 0 = FrSky SBUS).
@@ -284,7 +295,7 @@
 /*
   Bolder Flight Systems SBUS  8.1.4   (für RC_System 0-3)
   TinyGPSPlus 1.0.3                   (v4.04: Rolle GPS auf UART B/C)
-  RC_Common 1.2.0 im Sketch-Ordner src/RC_Common/ (ab v4.05), enthaelt
+  RC_Common 1.3.0 im Sketch-Ordner src/RC_Common/ (ab v4.05), enthaelt
     CRSF_ESP32 1.1.0, Basis https://github.com/Ziege-One/CRSF_ESP32
 */
 
@@ -308,7 +319,8 @@
 #include "src/RC_Common/web_common.h"
 #include "src/RC_Common/config_backup.h"   // v4.06
 
-constexpr uint16_t Version = 408; // 4.08 - CRSF Parameter Version Number
+constexpr uint16_t Version = 409; // 4.09 - CRSF Parameter Version Number
+// v4.09: Lua: Chunk-Fix (RC_Common 1.3.0), Werte in Ordnernamen, unpassende Felder ausgeblendet.
 // v4.08: Lua: "PWM Festwert" bleibt bei PWM Modus MWprop ein Zahlenfeld (gesperrt) statt Info-Feld - sonst erst nach Menue-Verlassen einstellbar.
 
 // ======== SBUS-Schwellen (benannte Konstanten) ==================
@@ -930,6 +942,19 @@ static void    luaSetAddr(uint8_t, uint8_t v)   { modul_adress = v; crsf.setDevi
 static uint8_t luaGetCrsfCh(uint8_t)            { return (uint8_t)CRSF_Channel; }
 static void    luaSetCrsfCh(uint8_t, uint8_t v) { CRSF_Channel = v; nvsSave(); }
 
+// Lua-Menue uebersichtlicher (RC_Common 1.3.0, wie RC-Multiswitch-Sound v1.05):
+// Felder ohne Wirkung werden ausgeblendet (CRSF hidden, Feld-IDs bleiben),
+// Ordnernamen zeigen den aktuellen Wert. Das Lua gibt es nur bei CRSF, Feld 4
+// ist trotz des alten Namens "CRSF Kanal" der SBUS-Kanal fuer den Einkanal-
+// Empfang und hat dort keine Wirkung.
+static void luaHideSbusOnly(uint8_t, LuaView& v, char*) {
+    if (RC_System_boot == 4) v.hidden = true;
+}
+static void luaShowGlobalFolder(uint8_t, LuaView& v, char* buf) {
+    snprintf(buf, LUA_VIEW_BUF, "Global (Adr %d)", (int)modul_adress);
+    v.name = buf;
+}
+
 static uint8_t luaGetQuelle(uint8_t x)            { return getKanalQuelle(x); }
 static void    luaSetQuelle(uint8_t x, uint8_t v) { setKanalQuelleNr(x, v, getKanalNr(x)); nvsSave(); }  // Nr bleibt
 static uint8_t luaGetNr(uint8_t x)                { return getKanalNr(x); }
@@ -953,6 +978,17 @@ static void    luaSetBlink(uint8_t x, uint8_t v) {
         mode[x] = ((uint16_t)mH << 8) | mL;
     }
     nvsSave();
+}
+// Quelle im Ordnernamen, z. B. "Ausgang 1 (Kanal_L 5)"
+static void luaShowOutFolder(uint8_t x, LuaView& v, char* buf) {
+    static const char* const Q[] = {"Bit", "Kanal_L", "Kanal_H", "MKan1 Bit", "MKan2 Bit"};
+    uint8_t q = getKanalQuelle(x);
+    snprintf(buf, LUA_VIEW_BUF, "%s (%s %d)", luaOutName[x], Q[q < 5 ? q : 0], (int)getKanalNr(x));
+    v.name = buf;
+}
+// Blinkzeiten nur bei "Blinken" sichtbar
+static void luaViewBlinkTime(uint8_t x, LuaView& v, char*) {
+    if (!((mode[x] >> 8) & 0xFF)) v.hidden = true;
 }
 static uint8_t luaGetBlinkOn(uint8_t x)  { uint8_t mH = (mode[x] >> 8) & 0xFF; return mH ? mH : 10; }
 static void    luaSetBlinkOn(uint8_t x, uint8_t v)  { mode[x] = ((uint16_t)v << 8) | (mode[x] & 0xFF); nvsSave(); }
@@ -981,6 +1017,7 @@ static void    luaSetPwm(uint8_t x, uint8_t v) { pwm_wert[x] = v; nvsSave(); }
 static void    luaViewPwm(uint8_t x, LuaView& v, char*) {
     if (getPwmModus(x) != 1) return;
     v.min = v.max = v.value;
+    v.hidden = true;   // bei MWprop ausgeblendet (Typ bleibt Zahl)
 }
 static uint8_t luaGetTest(uint8_t)             { return 0; }
 static void    luaSetTest(uint8_t x, uint8_t v) {
@@ -1001,6 +1038,21 @@ static void    luaSetWifiAlways(uint8_t, uint8_t v) { g_wifi_always_on = (v != 0
 static uint8_t luaGetRole(uint8_t i)            { return g_port_role[i]; }
 static void    luaSetRole(uint8_t i, uint8_t v) { setPortRole(i, v); nvsSave(); }
 static uint8_t luaGetBaud(uint8_t i)            { return uartBaudToIndex(g_port_baud[i]); }
+// Rollen im Ordnernamen, Baudrate nur bei aktivem Port sichtbar
+static void luaShowUartFolder(uint8_t, LuaView& v, char* buf) {
+#if defined(UART_C_SERIAL)
+    snprintf(buf, LUA_VIEW_BUF, "UART B/C (%s, %s)", uartRoleName(g_port_role[0]), uartRoleName(g_port_role[1]));
+#else
+    snprintf(buf, LUA_VIEW_BUF, "UART B (%s)", uartRoleName(g_port_role[0]));
+#endif
+    v.name = buf;
+}
+static void luaViewBaud(uint8_t i, LuaView& v, char*) {
+    if (g_port_role[i] == 0) v.hidden = true;
+}
+#if !defined(UART_C_SERIAL)
+static void luaHideAlways(uint8_t, LuaView& v, char*) { v.hidden = true; }   // C3: kein UART C
+#endif
 static void    luaSetBaud(uint8_t i, uint8_t v) { g_port_baud[i] = uartBaudFromIndex(v); nvsSave(); }
 
 static void buildLuaMenu() {
@@ -1011,19 +1063,20 @@ static void buildLuaMenu() {
     static char luaVersionText[16];
     snprintf(luaVersionText, sizeof(luaVersionText), "v%d.%02d %s", Version / 100, Version % 100, BOARD_NAME);
     m.info(1, 0, "Version", luaVersionText);
-    m.folder(2, 0, "Global");
+    m.folder(2, 0, "Global")->view = luaShowGlobalFolder;
     m.u8(3, 2, "Switch Addr", 0, 20, "", luaGetAddr, luaSetAddr);
-    m.u8(4, 2, "CRSF Kanal", 0, 15, "", luaGetCrsfCh, luaSetCrsfCh);
+    m.u8(4, 2, "SBUS EK Kanal", 0, 15, "", luaGetCrsfCh, luaSetCrsfCh)->view = luaHideSbusOnly;
     for (uint8_t x = 0; x < 8; x++) {
         uint8_t fi = 5 + x * 9;
         snprintf(luaOutName[x], sizeof(luaOutName[x]), "Ausgang %d", x + 1);
-        m.folder(fi, 0, luaOutName[x]);
+        LuaItem* fo = m.folder(fi, 0, luaOutName[x]);
+        fo->arg = x; fo->view = luaShowOutFolder;
         m.select(fi + 1, fi, "Ausgang-Quelle", "Einzelkanal;Kanal_L;Kanal_H;MKan1;MKan2",
                  luaGetQuelle, luaSetQuelle, x);
         m.u8(fi + 2, fi, "Bit Nr", 1, 8, "", luaGetNr, luaSetNr, x)->view = luaViewNr;
         m.select(fi + 3, fi, "Blink", "Dauerlicht;Blinken", luaGetBlink, luaSetBlink, x);
-        m.u8(fi + 4, fi, "Blink AN *10ms", 1, 250, "", luaGetBlinkOn, luaSetBlinkOn, x);
-        m.u8(fi + 5, fi, "Blink AUS *10ms", 1, 250, "", luaGetBlinkOff, luaSetBlinkOff, x);
+        m.u8(fi + 4, fi, "Blink AN *10ms", 1, 250, "", luaGetBlinkOn, luaSetBlinkOn, x)->view = luaViewBlinkTime;
+        m.u8(fi + 5, fi, "Blink AUS *10ms", 1, 250, "", luaGetBlinkOff, luaSetBlinkOff, x)->view = luaViewBlinkTime;
         m.select(fi + 6, fi, "PWM Modus", "Festwert;MWprop (Kanal=Ausgang)",
                  luaGetPwmModus, luaSetPwmModus, x)->view = luaViewPwmModus;
         m.u8(fi + 7, fi, "PWM Festwert", 0, 255, "", luaGetPwm, luaSetPwm, x)->view = luaViewPwm;
@@ -1033,18 +1086,18 @@ static void buildLuaMenu() {
     m.select(78, 77, "Auto-Failsafe", "Aus;Ein", luaGetWifiAuto, luaSetWifiAuto);
     m.u8(79, 77, "Auto Timeout", 5, 240, "s", luaGetWifiTo, luaSetWifiTo);
     m.select(80, 77, "Dauerhaft an", "Aus;Ein", luaGetWifiAlways, luaSetWifiAlways);
-    m.folder(81, 0, "UART B/C");
+    m.folder(81, 0, "UART B/C")->view = luaShowUartFolder;
     m.select(82, 81, "UART B (Neustart)", uartRoleOptions(), luaGetRole, luaSetRole, 0);
 #if defined(UART_C_SERIAL)
     m.select(83, 81, "UART C (Neustart)", uartRoleOptions(), luaGetRole, luaSetRole, 1);
 #else
-    m.info(83, 81, "UART C", "nicht vorhanden (C3)");
+    m.info(83, 81, "UART C", "nicht vorhanden (C3)")->view = luaHideAlways;
 #endif
-    m.select(84, 81, "UART B Baud", uartBaudOptions(), luaGetBaud, luaSetBaud, 0);
+    m.select(84, 81, "UART B Baud", uartBaudOptions(), luaGetBaud, luaSetBaud, 0)->view = luaViewBaud;
 #if defined(UART_C_SERIAL)
-    m.select(85, 81, "UART C Baud", uartBaudOptions(), luaGetBaud, luaSetBaud, 1);
+    m.select(85, 81, "UART C Baud", uartBaudOptions(), luaGetBaud, luaSetBaud, 1)->view = luaViewBaud;
 #else
-    m.info(85, 81, "UART C Baud", "nicht vorhanden (C3)");
+    m.info(85, 81, "UART C Baud", "nicht vorhanden (C3)")->view = luaHideAlways;
 #endif
 }
 
