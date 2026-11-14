@@ -1,4 +1,4 @@
-# Firmware RC-Multiswitch v4.07
+# Firmware RC-Multiswitch v4.08
 
 Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis ist MultiSwitch_ESP32_V3 v3.12. Spezifikation: `docs/Firmware-Spezifikation.md`.
 
@@ -33,6 +33,7 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
 
 ## Stand
 - v4.04 kompiliert fuer C3 und S3 (CI). v4.02: CRSF-Link-Statistik (LQ) korrigiert. v4.03: SBUS-Zeitlimit 10 s (ohne Frames gehen die Ausgaenge aus). v4.04: Rolle von UART B/C waehlbar (CRSF, S.Port, GPS). v4.05: gemeinsame Basis RC_Common (CRSF-Bibliothek 1.1.0 mit korrekter Command-CRC, Lua-Menue als Tabelle, gemeinsame NVS-Schluessel mit Uebernahme der alten Werte, Baudrate je UART, Rolle Raw). v4.06: Einstellungs-Backup im Flash des Moduls (Web-UI, Karte „Konfiguration sichern“), automatisch vor Import und OTA (RC_Common 1.2.0, Partitionsschema mit SPIFFS). v4.07: Werkseinstellung RC-System CRSF statt SBUS, Lua zeigt die richtige Version. Noch nicht auf Hardware getestet.
+- v4.08: Lua: „PWM Festwert“ bleibt bei PWM Modus „MWprop“ ein Zahlenfeld (gesperrt) statt Info-Feld. Vorher ließ sich der Festwert nach dem Zurückstellen auf „Festwert“ erst nach Verlassen des Menüs einstellen (das ELRS-Lua-Skript lädt nur Zahlen- und Auswahlfelder neu).
 - Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
