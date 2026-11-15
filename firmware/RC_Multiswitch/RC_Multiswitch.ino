@@ -1,5 +1,5 @@
 /*
-    RC-Multiswitch  v4.10  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
+    RC-Multiswitch  v4.11  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
    v4.00 abgezweigt von ESP32-MultiSwitch v3.12 (Repo ESP32-Multiswitch-
    CRSF-bidirektional, MultiSwitch_ESP32_V3). Gleicher Quellcode fuer beide
    Platinen, Board-Auswahl in board_config.h.
@@ -31,6 +31,11 @@
    3 = HoTT           (SBUS)
    4 = CRSF           (ExpressLRS / TBS CrossFire, bidirektional)
  Lua-Konfiguration und (ab Schritt 3) Modulkette gibt es nur bei CRSF.
+
+ ÄNDERUNGEN v4.11:
+   - FIX: baut mit esp32-Core 3.3.x (Arduino IDE). BOOT_PIN heisst jetzt
+     BOOT_BTN_PIN, weil der neue Core BOOT_PIN selbst definiert (wie
+     RC-Multiswitch-Sound v1.01). CI baut zusaetzlich mit 3.3.12.
 
  ÄNDERUNGEN v4.10 (RC_Common 1.4.0, Status-LED wie alle Module):
    - Status-LED (S3) mit demselben Farbschema wie CRSF-Router und
@@ -328,7 +333,8 @@
 #include "src/RC_Common/web_common.h"
 #include "src/RC_Common/config_backup.h"   // v4.06
 
-constexpr uint16_t Version = 410; // 4.10 - CRSF Parameter Version Number
+constexpr uint16_t Version = 411; // 4.11 - CRSF Parameter Version Number
+// v4.11: baut mit Core 3.3.x (BOOT_PIN -> BOOT_BTN_PIN).
 // v4.10: Status-LED einheitlich (RC_Common 1.4.0), Lua "LED Farbfolge", BOOT 2 s.
 // v4.09: Lua: Chunk-Fix (RC_Common 1.3.0), Werte in Ordnernamen, unpassende Felder ausgeblendet.
 // v4.08: Lua: "PWM Festwert" bleibt bei PWM Modus MWprop ein Zahlenfeld (gesperrt) statt Info-Feld - sonst erst nach Menue-Verlassen einstellbar.
@@ -1166,7 +1172,7 @@ static void bootButtonCheck() {
     static bool          fired   = false;
     static unsigned long downMs  = 0;
 
-    bool down = (digitalRead(BOOT_PIN) == LOW);
+    bool down = (digitalRead(BOOT_BTN_PIN) == LOW);
     if (!armed) { if (!down) armed = true; return; }
     if (!down) { pressed = false; return; }
     unsigned long now = millis();
@@ -1344,7 +1350,7 @@ void setup() {
 #else
     statusLed.begin(STATUS_LED_PIN, false);
 #endif
-    pinMode(BOOT_PIN, INPUT_PULLUP);   // v4.01: BOOT-Taster fuer den WLAN-AP
+    pinMode(BOOT_BTN_PIN, INPUT_PULLUP);   // v4.01: BOOT-Taster fuer den WLAN-AP
 
     webui_init();
 

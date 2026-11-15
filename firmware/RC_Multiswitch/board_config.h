@@ -50,7 +50,7 @@
   static constexpr uint8_t UART_B_TX = 10;
   // UART C: nicht vorhanden
 
-  static constexpr uint8_t BOOT_PIN = 9;
+  static constexpr uint8_t BOOT_BTN_PIN = 9;
   // Keine steuerbare Status-LED (Onboard-LED IO8 ist UART-B-RX)
   static constexpr int STATUS_LED_PIN = -1;
   #define STATUS_LED_WS2812 0
@@ -72,7 +72,7 @@
   static constexpr uint8_t UART_C_RX = 1;
   static constexpr uint8_t UART_C_TX = 2;
 
-  static constexpr uint8_t BOOT_PIN = 0;
+  static constexpr uint8_t BOOT_BTN_PIN = 0;
   // WS2812 auf dem S3-Zero
   static constexpr int STATUS_LED_PIN = 21;
   #define STATUS_LED_WS2812 1
