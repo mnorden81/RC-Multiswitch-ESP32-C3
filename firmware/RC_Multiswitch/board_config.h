@@ -54,6 +54,7 @@
   // Keine steuerbare Status-LED (Onboard-LED IO8 ist UART-B-RX)
   static constexpr int STATUS_LED_PIN = -1;
   #define STATUS_LED_WS2812 0
+  #define STATUS_LED_RGB_DEFAULT false
 
 #elif defined(BOARD_S3)
   #define BOARD_NAME "S3"
@@ -76,4 +77,7 @@
   static constexpr int STATUS_LED_PIN = 21;
   #define STATUS_LED_WS2812 1
   static constexpr uint8_t STATUS_LED_BRIGHTNESS = 40;  // von 255, ca. 15 %
+  // v4.10: LED des S3-Zero erwartet RGB statt GRB (Rot/Gruen vertauscht),
+  // Vorgabe fuer Lua "LED Farbfolge" (NVS "ledrgb")
+  #define STATUS_LED_RGB_DEFAULT true
 #endif

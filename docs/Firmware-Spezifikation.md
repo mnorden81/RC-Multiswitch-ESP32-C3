@@ -116,24 +116,25 @@ Mehrere Module werden hintereinander geschaltet: Empfänger → Modul 1 (UART A)
 ## 5. WLAN und Web-UI
 
 - Web-UI, JSON-Export/-Import, OTA und AP-Verhalten wie V3 (Einstellung „AP dauerhaft an“ mit Standard AN, Auto-Failsafe-AP, manuell an/aus).
-- **BOOT-Taster langer Druck (≥ 3 s)** schaltet den WLAN-Access-Point zur Laufzeit um (an ↔ aus). Auswertung **nur nach dem Booten** (Taster ist Strapping-Pin: low beim Reset = Download-Modus).
+- **BOOT-Taster langer Druck (≥ 2 s, bis v4.09 3 s)** schaltet den WLAN-Access-Point zur Laufzeit um (an ↔ aus). Auswertung **nur nach dem Booten** (Taster ist Strapping-Pin: low beim Reset = Download-Modus).
 - `WifiPin=13` der V3 entfällt komplett – GPIO13 ist auf dem S3 UART-B-TX.
-- Der WLAN-Zustand wird im Status-LED-Muster nicht abgebildet (siehe 6), Rückmeldung ggf. über Web-UI/Debug-Log.
+- Ab v4.10 zeigt die Status-LED WLAN an mit Violett statt Grün/Rot (siehe 6).
 
 
 ## 6. Status-LED
 
-Die Status-LED zeigt den CRSF-Linkzustand. Ausgangsbasis ist das V3-Verhalten; die ergänzenden Muster sind Vorschläge und zu bestätigen (O1).
+Ab v4.10 gilt das gemeinsame Schema aller Module (RC_Common 1.4.0, `status_led.h`):
 
-| Zustand | Muster |
+| Zustand | Muster (S3, WS2812) |
 |---|---|
-| Kein gültiger CRSF-Frame (BUS nicht OK, Timeout > 2 s) | aus (V3) |
-| CRSF-Frames gültig, Link aktiv (BUS_OK) | blinkt 500 ms an / 500 ms aus (V3) |
-| Optional (O1): Frames da, aber Failsafe / kein RC-Link | schnelles Blinken (z. B. 100 ms) |
-| Optional (O1): Konfigurationsfehler (doppelte Adresse) | Doppelblitz |
+| CRSF-Frames gültig, Link aktiv (BUS_OK) | grün, 500 ms an / 500 ms aus |
+| Frames da, aber Failsafe / kein RC-Link | rot, schnell 100 ms |
+| Kein gültiger Frame (Timeout > 2 s) | rot, kurzes Aufblitzen 100 ms alle 1 s |
+| Doppelte Moduladresse in der Kette | blau, Doppelblitz |
+| WLAN an | violett statt grün/rot, Muster bleibt |
 
 - C3: keine steuerbare Status-LED (Onboard-LED IO8 ist UB_RX) → `STATUS_LED_PIN = -1`, Funktion kompiliert aus. Der LED-Pin darf nicht als UART-B-Pin umkonfiguriert werden.
-- S3: WS2812 an IO21 per `neopixelWrite(21, r, g, b)`, Farbe z. B. grün für Link aktiv; Helligkeit niedrig (≤ 20 %).
+- S3: WS2812 an IO21 per `neopixelWrite`, Helligkeit niedrig (≤ 20 %). Die LED des S3-Zero erwartet RGB statt GRB; Lua Global > „LED Farbfolge“ (Feld 86, Vorgabe RGB).
 - Aktualisierung nicht blockierend (`millis()`-basiert), unabhängig vom Router.
 
 

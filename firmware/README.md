@@ -21,8 +21,8 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
   - Bei CRSF gehen Zellspannungen und GPS alle 100 ms als Telemetrie an den Sender. Bei SBUS werden die Werte nur im Debug-Tab angezeigt.
   - S.Port und GPS gibt es nur einmal: steht UART C auf derselben Rolle wie UART B, bleibt UART C aus.
 - **Modulkette (nur CRSF):** UART B (C3 und S3) und UART C (nur S3) mit Rolle CRSF gehen zum naechsten Modul. Jedes Modul braucht eine eigene Modul-Adresse (0-15). Alle Module erscheinen im Lua-Menue als `<Name>@<Adresse>` und lassen sich einzeln einstellen.
-- **BOOT-Taster:** 3 s gedrueckt halten schaltet den WLAN-AP ein oder aus (bis zum Neustart, die Einstellung "Dauerhaft an" bleibt unveraendert).
-- **Status-LED (nur S3, gruen):** aus = kein Signal, 500 ms blinken = OK, schnell 100 ms = Failsafe bzw. kein RC-Link, Doppelblitz = doppelte Modul-Adresse in der Kette.
+- **BOOT-Taster:** 2 s gedrueckt halten (bis v4.09: 3 s) schaltet den WLAN-AP ein oder aus (bis zum Neustart, die Einstellung "Dauerhaft an" bleibt unveraendert).
+- **Status-LED (nur S3), gleiches Schema wie alle Module (ab v4.10):** gruen langsam (500 ms) = OK, rot schnell (100 ms) = Failsafe bzw. kein RC-Link, rot Aufblitzen (kurz alle 1 s) = kein Signal, blau Doppelblitz = doppelte Modul-Adresse in der Kette, violett statt gruen/rot = WLAN an. Rot und Gruen vertauscht? Lua Global > "LED Farbfolge" auf GRB stellen (Vorgabe RGB fuer den S3-Zero).
 - Debug-Tab der Web-UI: CRSF-Zaehler plus Router-Zaehler (weitergeleitet, verworfen) und Warnung bei doppelter Adresse.
 
 ## Router-Regeln
