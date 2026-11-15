@@ -1,5 +1,5 @@
 /*
-    RC-Multiswitch  v4.09  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
+    RC-Multiswitch  v4.10  (ESP32-C3 SuperMini / Waveshare ESP32-S3-Zero)
    v4.00 abgezweigt von ESP32-MultiSwitch v3.12 (Repo ESP32-Multiswitch-
    CRSF-bidirektional, MultiSwitch_ESP32_V3). Gleicher Quellcode fuer beide
    Platinen, Board-Auswahl in board_config.h.
@@ -31,6 +31,15 @@
    3 = HoTT           (SBUS)
    4 = CRSF           (ExpressLRS / TBS CrossFire, bidirektional)
  Lua-Konfiguration und (ab Schritt 3) Modulkette gibt es nur bei CRSF.
+
+ ÄNDERUNGEN v4.10 (RC_Common 1.4.0, Status-LED wie alle Module):
+   - Status-LED (S3) mit demselben Farbschema wie CRSF-Router und
+     Soundmodule: gruen langsam = OK, rot schnell = Failsafe / kein
+     RC-Link, rot Aufblitzen = kein Signal (vorher aus), blau Doppelblitz =
+     doppelte Moduladresse, violett statt gruen/rot = WLAN an.
+   - NEU Lua Global > "LED Farbfolge" (Feld 86, NVS "ledrgb"): RGB (S3-Zero,
+     Vorgabe) oder GRB (Standard-WS2812). Beim C3 ausgeblendet (keine LED).
+   - BOOT-Taster: 2 s halten (vorher 3 s) schaltet das WLAN, wie beim Router.
 
  ÄNDERUNGEN v4.09 (RC_Common 1.3.0, Lua wie RC-Multiswitch-Sound v1.05):
    - FIX: Lange Lua-Auswahlfelder (Ausgang-Quelle, UART-Baudrate) kommen
@@ -319,7 +328,8 @@
 #include "src/RC_Common/web_common.h"
 #include "src/RC_Common/config_backup.h"   // v4.06
 
-constexpr uint16_t Version = 409; // 4.09 - CRSF Parameter Version Number
+constexpr uint16_t Version = 410; // 4.10 - CRSF Parameter Version Number
+// v4.10: Status-LED einheitlich (RC_Common 1.4.0), Lua "LED Farbfolge", BOOT 2 s.
 // v4.09: Lua: Chunk-Fix (RC_Common 1.3.0), Werte in Ordnernamen, unpassende Felder ausgeblendet.
 // v4.08: Lua: "PWM Festwert" bleibt bei PWM Modus MWprop ein Zahlenfeld (gesperrt) statt Info-Feld - sonst erst nach Menue-Verlassen einstellbar.
 
@@ -426,6 +436,7 @@ uint8_t wm_prop_value[8] = {255, 255, 255, 255, 255, 255, 255, 255};
 
 // ======== Konfiguration (aus NVS) ===============================
 int RC_System      = 4;   // v4.07: Werkseinstellung CRSF (vorher 0 = FrSky SBUS)
+bool g_led_rgb    = STATUS_LED_RGB_DEFAULT;   // v4.10: LED-Farbfolge RGB (S3-Zero) oder GRB
 int einkanal_mode  = 0;
 int CRSF_Channel   = 4;
 int modul_adress   = 0;
@@ -555,6 +566,7 @@ static void nvsWriteNow() {
         snprintf(key, sizeof(key), "pw3_%d", i); p.putInt(key, pwm_wert3[i]);
         snprintf(key, sizeof(key), "mo3_%d", i); p.putInt(key, mode3[i]);
     }
+    p.putBool("ledrgb", g_led_rgb);   // v4.10
     // v4.05: gemeinsame Schluessel aus RC_Common (settings_common.h)
     RcCommonSettings s;
     commonToSettings(s);
@@ -614,6 +626,7 @@ static void nvsLoad() {
         snprintf(key, sizeof(key), "pw3_%d", i); pwm_wert3[i]      = p.getInt(key, 255);
         snprintf(key, sizeof(key), "mo3_%d", i); mode3[i]          = p.getInt(key, 0);
     }
+    g_led_rgb = p.getBool("ledrgb", STATUS_LED_RGB_DEFAULT);   // v4.10
     // v4.05: gemeinsame Schluessel (RC_Common). Fehlen sie (erster Start
     // nach dem Update), werden die alten Schluessel einmalig uebernommen.
     // Defaults wie bisher: WLAN-Auto-Failsafe und "dauerhaft an" AN (siehe
@@ -651,6 +664,7 @@ static void nvsReset() {
     g_wifi_auto = true; g_wifi_auto_timeout = 60;    // NEU v2.00, Default AN seit v2.01
     g_wifi_always_on = true;                         // NEU v2.02
     for (int i = 0; i < 2; i++) { g_port_role[i] = UROLE_CRSF; g_port_baud[i] = uartRoleDefaultBaud(UROLE_CRSF); }  // v4.05
+    g_led_rgb = STATUS_LED_RGB_DEFAULT;   // v4.10
     nvsSave();
     nvsFlushPending();
 }
@@ -658,16 +672,18 @@ static void nvsReset() {
 void storageSave() { nvsFlushPending(); }
 
 // ======== Status-LED ============================================
-// v4.00: Muster nach Firmware-Spezifikation Kapitel 6, ab v4.05 aus
-// RC_Common (status_led.h): aus = kein Signal, langsam = OK, schnell =
-// Frames ohne RC-Link bzw. Failsafe, Doppelblitz = Konfigurationsfehler.
+// v4.10: Farben und Muster aus RC_Common 1.4.0, gleiches Schema in allen
+// Modulen: gruen langsam = OK, rot schnell = Frames ohne RC-Link bzw.
+// Failsafe, rot Aufblitzen = kein Signal, blau Doppelblitz = doppelte
+// Moduladresse, violett statt gruen/rot = WLAN an.
 // Reine Anzeige - aendert weder BUS_OK noch das Ausgangsverhalten.
 
 // Konfigurationsfehler (Doppelblitz). v4.01: gesetzt, wenn der Router eine
 // doppelte Moduladresse erkennt (siehe loop()).
 bool g_ledConfigError = false;
 static unsigned long lastSbusFrameMs = 0;
-static StatusLed statusLed;   // S3 WS2812 gruen, C3 ohne LED (Pin -1)
+static StatusLed statusLed;   // S3 WS2812, C3 ohne LED (Pin -1)
+bool webui_isApActive();      // webui.h
 
 static void updateLed() {
     unsigned long now = millis();
@@ -681,7 +697,9 @@ static void updateLed() {
     in.uplinkLQ        = ls.uplinkLQ;
     in.lastSbusFrameMs = lastSbusFrameMs;
     in.sbusFailsafe    = sbus_data.failsafe;
-    statusLed.update(statusLedMode(in, now), now);
+    statusLed.setRgbOrder(g_led_rgb);
+    // Doppelblitz gibt es hier nur bei doppelter Adresse -> blau
+    statusLed.update(statusLedMode(in, now), now, g_ledConfigError, webui_isApActive());
 }
 
 // ======== CRSF-Failsafe =========================================
@@ -950,6 +968,9 @@ static void    luaSetCrsfCh(uint8_t, uint8_t v) { CRSF_Channel = v; nvsSave(); }
 static void luaHideSbusOnly(uint8_t, LuaView& v, char*) {
     if (RC_System_boot == 4) v.hidden = true;
 }
+static uint8_t luaGetLedRgb(uint8_t)            { return g_led_rgb ? 0 : 1; }   // v4.10
+static void    luaSetLedRgb(uint8_t, uint8_t v) { g_led_rgb = (v == 0); nvsSave(); }
+
 static void luaShowGlobalFolder(uint8_t, LuaView& v, char* buf) {
     snprintf(buf, LUA_VIEW_BUF, "Global (Adr %d)", (int)modul_adress);
     v.name = buf;
@@ -1066,6 +1087,11 @@ static void buildLuaMenu() {
     m.folder(2, 0, "Global")->view = luaShowGlobalFolder;
     m.u8(3, 2, "Switch Addr", 0, 20, "", luaGetAddr, luaSetAddr);
     m.u8(4, 2, "SBUS EK Kanal", 0, 15, "", luaGetCrsfCh, luaSetCrsfCh)->view = luaHideSbusOnly;
+#if STATUS_LED_WS2812
+    m.select(86, 2, "LED Farbfolge", "RGB (S3-Zero);GRB", luaGetLedRgb, luaSetLedRgb);   // v4.10
+#else
+    m.info(86, 2, "LED Farbfolge", "keine LED (C3)")->view = luaHideAlways;
+#endif
     for (uint8_t x = 0; x < 8; x++) {
         uint8_t fi = 5 + x * 9;
         snprintf(luaOutName[x], sizeof(luaOutName[x]), "Ausgang %d", x + 1);
@@ -1129,11 +1155,11 @@ static void wifiFailsafeCheck() {
 }
 
 // ======== BOOT-Taster (NEU v4.01) ===============================
-// Langer Druck (>= 3 s) schaltet den WLAN-AP um, wirkt sofort und ohne
+// Langer Druck (>= 2 s, bis v4.09 3 s) schaltet den WLAN-AP um, wirkt sofort und ohne
 // nvsSave() - wie der Sofort-Schalter in der Web-UI. Der Taster ist ein
 // Strapping-Pin (beim Reset gedrueckt = Download-Modus). Deshalb wird er
 // erst ausgewertet, nachdem er nach dem Booten einmal losgelassen war.
-static constexpr unsigned long BOOT_LONG_PRESS_MS = 3000;
+static constexpr unsigned long BOOT_LONG_PRESS_MS = 2000;   // v4.10: 2 s wie beim Router
 static void bootButtonCheck() {
     static bool          armed   = false;
     static bool          pressed = false;

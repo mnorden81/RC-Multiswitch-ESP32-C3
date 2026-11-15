@@ -69,7 +69,7 @@ Arduino IDE: Board „ESP32C3 Dev Module“ bzw. „ESP32S3 Dev Module“, USB C
 | 4.1 | Nur USB stecken, Sketch firmware/RC_Multiswitch hochladen | Upload ohne Fehler | ☐ | |
 | 4.2 | Seriellen Monitor 115200 Baud öffnen, Reset drücken | Zeilen „CRSF gestartet (Board C3/S3 …)“, „RC-Multiswitch C3 v4.07“ bzw. S3, „SSID: MultiSwitch“, „IP: 192.168.1.1“ | ☐ | |
 | 4.3 | USB ab, Modul nur über CN1 versorgen | WLAN „MultiSwitch“ erscheint nach wenigen Sekunden („Dauerhaft an“ ist ab Werk EIN) | ☐ | |
-| 4.4 | nur S3: Status-LED ohne Empfänger | aus (kein Signal) | ☐ | |
+| 4.4 | nur S3: Status-LED ohne Empfänger | rot (oder violett bei WLAN an), kurzes Aufblitzen alle 1 s (kein Signal) | ☐ | |
 | 4.5 | BOOT-Taster kurz drücken im Betrieb | nichts passiert, kein Neustart | ☐ | |
 | 4.6 | BOOT beim Einstecken gedrückt halten | Modul startet im Download-Modus (kein WLAN), nach Reset ohne Taster wieder normal | ☐ | |
 
@@ -98,8 +98,8 @@ Zugang ab Werk: WLAN „MultiSwitch“, Passwort 123456789, Adresse http://192.1
 | 5.2 | Übersicht ansehen | Board C3 bzw. S3 und Version 4.07 angezeigt | ☐ | |
 | 5.3 | Reiter RC-System: prüfen, dass „CRSF (ELRS/TBS)“ gewählt ist (sonst wählen, speichern, neu starten) | nach dem Neustart steht CRSF; serieller Monitor zeigt „CRSF gestartet … Geraeteadresse 0xC0 Slot 0“ | ☐ | |
 | 5.4 | Reiter Ausgänge: eine Einstellung ändern, speichern, Strom aus und wieder an | Änderung ist noch da (NVS) | ☐ | |
-| 5.5 | BOOT-Taster 3 s halten | WLAN geht aus (Handy verliert Verbindung) | ☐ | |
-| 5.6 | BOOT-Taster nochmal 3 s halten | WLAN „MultiSwitch“ ist wieder da | ☐ | |
+| 5.5 | BOOT-Taster 2 s halten | WLAN geht aus (Handy verliert Verbindung) | ☐ | |
+| 5.6 | BOOT-Taster nochmal 2 s halten | WLAN „MultiSwitch“ ist wieder da | ☐ | |
 | 5.7 | Reiter WiFi: SSID ändern (z. B. MultiSwitch-Test), speichern, neu starten | neues WLAN erscheint; danach zurück auf „MultiSwitch“ | ☐ | |
 
 ## 6. Empfang vom Empfänger (CRSF, optional SBUS)
@@ -109,10 +109,10 @@ Empfänger an CN1: TX des Empfängers an Pin 3 (RX), RX des Empfängers an Pin 4
 | Nr | Prüfung | Erwartet | OK | Notiz |
 | --- | --- | --- | --- | --- |
 | 6.1 | Sender ein, Empfänger verbunden | Debug-Reiter: CRSF-Zähler steigen, kein CRC-Fehler-Anstieg | ☐ | |
-| 6.2 | nur S3: Status-LED | grün, blinkt 500 ms an / 500 ms aus | ☐ | |
+| 6.2 | nur S3: Status-LED | grün (bei WLAN an violett), blinkt 500 ms an / 500 ms aus. Rot statt grün: Lua Global > „LED Farbfolge“ auf GRB | ☐ | |
 | 6.3 | Sender: ExpressLRS-Lua bzw. Geräte-Menü öffnen | Gerät „MultiSwitch@0“ erscheint | ☐ | |
 | 6.4 | Einen Ausgang einschalten (Schritt 7), dann Sender ausschalten | Ausgang geht spätestens nach ca. 2 s aus (Failsafe) | ☐ | ___ s |
-| 6.5 | nur S3: Status-LED bei Sender aus | schnell blinken (100 ms) oder aus, je nachdem ob der Empfänger noch Frames schickt | ☐ | |
+| 6.5 | nur S3: Status-LED bei Sender aus | rot schnell (100 ms) oder rot Aufblitzen, je nachdem ob der Empfänger noch Frames schickt | ☐ | |
 | 6.6 | Sender wieder ein | Link kommt zurück, Ausgänge folgen wieder den Schaltern | ☐ | |
 | 6.7 | WLAN-Auto-Failsafe: in Lua Ordner WLAN „Dauerhaft an“ = Aus, neu starten mit Sender an | kein WLAN | ☐ | |
 | 6.8 | Sender ausschalten und warten (Auto Timeout ab Werk 60 s) | WLAN „MultiSwitch“ erscheint nach ca. 60 s | ☐ | ___ s |
@@ -196,7 +196,7 @@ Modul 1 hängt am Empfänger, Modul 2 per 1:1-Kabel an J5 von Modul 1, Modul 3 a
 | 9c.4 | 3 Module, Geräteliste | alle drei erscheinen, auch nach mehrmaligem Neuladen | ☐ | |
 | 9c.5 | Sender aus | alle Module gehen nach ca. 2 s in Failsafe | ☐ | |
 | 9c.6 | nur S3: Modul an J5 und eins an J6 gleichzeitig | beide erreichbar, keine doppelten Einträge, keine Endlosschleife (Debug: Router-Zähler steigen gleichmäßig) | ☐ | |
-| 9c.7 | Zwei Module absichtlich mit gleicher Adresse | Warnung im Debug-Reiter, S3-LED Doppelblitz | ☐ | |
+| 9c.7 | Zwei Module absichtlich mit gleicher Adresse | Warnung im Debug-Reiter, S3-LED blau Doppelblitz | ☐ | |
 | 9c.8 | Debug-Reiter von Modul 1 | Zähler „verworfen“ steigt kaum; keine CRC-Fehler beim Nachbarn | ☐ | |
 | 9c.9 | Optional Latenz: Ausgang 1 an Modul 1 und 3 gleichzeitig schalten, Oszilloskop oder Logikanalysator | Versatz je Modul wenige ms | ☐ | ___ ms |
 
