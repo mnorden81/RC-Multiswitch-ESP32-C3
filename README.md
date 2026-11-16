@@ -50,7 +50,7 @@ Board: ESP32-C3 SuperMini
 - CRSF auf UART A (Werkseinstellung ab v4.07), wahlweise SBUS. UART B (und UART C beim S3) per Lua oder Web-UI auf Aus, CRSF (Modulkette), S.Port, GPS oder Raw einstellbar, mit eigener Baudrate je UART. Beim GPS sucht die Baudrate „Auto“ (Vorgabe) die Rate selbst und stellt das GPS auf 115200 Baud und 10 Hz um, wie bei Betaflight. In der Modulkette ist jedes Modul mit eigener Adresse ueber Lua einzeln einstellbar.
 - Gemeinsame Basis aller ESP32-Module seit v4.05: `firmware/RC_Multiswitch/src/RC_Common/` (CRSF-Bibliothek mit Router, UART-Rollen, Lua-Menue, NVS, WLAN-Failsafe, Status-LED, OTA), siehe deren README. Lua-Menü ab v4.09: Ordner zeigen ihren Wert (z. B. „Ausgang 1 (Kanal_L 5)“), Felder ohne Wirkung werden ausgeblendet.
 - BOOT-Taster 2 s halten: WLAN-AP ein/aus. Status-LED nur beim S3 (der C3 hat keine), ab v4.10 mit denselben Farben wie alle Module.
-- Details und Bauanleitung: [firmware/README.md](firmware/README.md).
+- Details und Bauanleitung: [firmware/README.md](firmware/README.md). Alle Versionen: [CHANGELOG.md](CHANGELOG.md).
 
 ## Firmware flashen
 
