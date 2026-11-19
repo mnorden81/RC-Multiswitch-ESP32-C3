@@ -2,6 +2,10 @@
 
 Gleiche Firmware für alle Platinen, deshalb gleiche Versionsnummern in den Repos RC-Multiswitch-ESP32-C3, RC-Multiswitch-ESP32-S3 und (ab v5.00) ESP32-Multiswitch-Basis_Ziege-One. Die Version wird bei jeder Änderung erhöht, weil sie als CRSF „Parameter Version Number“ an den Sender geht. Neueste Version oben.
 
+## v5.02 (RC_Common 1.5.1)
+- Fehlersuche Funk-Teilnehmer: Lua-Menü erscheint nicht, obwohl Pings ankommen. Reiter „Funk“ zeigt jetzt Gesamtzähler (Antworten in den Funk, gesendet, geschriebene Bytes, verworfen ohne Gegenstelle / Rückkanal aus / Rahmenfehler), Reiter „Debug“ zusätzlich „DEVICE_INFO gesendet“.
+- Fix: Eine in der Web-UI geänderte Modul-Adresse gilt sofort auch als CRSF-Geräteadresse (Lua, WM-Befehle an 0xC0 + Adresse) und im Funk-Ping. Vorher erst nach einem Neustart, über Lua ging es schon sofort.
+
 ## v5.01 (RC_Common 1.5.0)
 - Neu: **Funk** (ESP-NOW, aus der Funk-Brücke v0.1.9). Module ohne Kabel zum Empfänger bekommen CRSF per Funk. RC-System 5 = „CRSF + Funk senden (Zentrale)“: das Modul am Empfänger funkt alles vom Kabel weiter. RC-System 6 = „CRSF aus Funk (Teilnehmer)“: Kanäle, Lua und Telemetrie laufen über Funk, UART A bleibt frei. Pro Fahrzeug eine Zentrale und bis zu 8 Teilnehmer, eine Funk-Brücke kann an jeder Seite stehen. Noch nicht auf Hardware getestet.
 - Einstellungen: Fahrzeug-Kennung (1–255), Funkkanal (1–13), Sendeleistung (2–20 dBm, Vorgabe 20), bei der Zentrale „Kanäle alle“ (Vorgabe 10 ms), beim Teilnehmer „Rückkanal“ (Lua/Telemetrie, Vorgabe an). Web-UI Reiter RC-System, Karte „Funk“, oder Lua-Ordner „Funk“ (Felder 88–95). Wirken nach Neustart. NVS `fkid fkch fkpwr fkrate fkback`.
