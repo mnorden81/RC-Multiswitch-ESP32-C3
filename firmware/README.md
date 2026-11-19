@@ -23,17 +23,19 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3, S3 und ab v5.00
 - **Modulkette (nur CRSF):** UART B (C3 und S3) und UART C (nur S3) mit Rolle CRSF gehen zum naechsten Modul. Jedes Modul braucht eine eigene Modul-Adresse (0-15). Alle Module erscheinen im Lua-Menue als `<Name>@<Adresse>` und lassen sich einzeln einstellen.
 - **BOOT-Taster:** 2 s gedrueckt halten (bis v4.09: 3 s) schaltet den WLAN-AP ein oder aus (bis zum Neustart, die Einstellung "Dauerhaft an" bleibt unveraendert).
 - **Status-LED (nur S3), gleiches Schema wie alle Module (ab v4.10):** gruen langsam (500 ms) = OK, rot schnell (100 ms) = Failsafe bzw. kein RC-Link, rot Aufblitzen (kurz alle 1 s) = kein Signal, blau Doppelblitz = doppelte Modul-Adresse in der Kette, violett statt gruen/rot = WLAN an. Rot und Gruen vertauscht? Lua Global > "LED Farbfolge" auf GRB stellen (Vorgabe RGB fuer den S3-Zero).
+- **Funk (ab v5.01, ESP-NOW):** Module ohne Kabel zum Empfaenger. RC-System 5 „CRSF + Funk senden (Zentrale)“ am Modul am Empfaenger, RC-System 6 „CRSF aus Funk (Teilnehmer)“ an den anderen Modulen (UART A bleibt dort frei). Kanaele, Lua und Telemetrie laufen ueber Funk, die Zentrale ist Router-Port D. Einstellungen in der Web-UI (Karte „Funk“ im RC-Tab) oder im Lua-Ordner „Funk“ (88-95): Fahrzeug-Kennung und Funkkanal ueberall gleich, Sendeleistung, Kanal-Rate (Zentrale), Rueckkanal (Teilnehmer). Wirkt nach Neustart. WLAN laeuft dann auf dem Funkkanal. Reiter „Funk“: Ampel, Gegenstellen, Verlust, RSSI. Failsafe nach 2 s ohne Funk-Daten. Gelber Doppelblitz = zweite Zentrale mit derselben Kennung. Code: `src/RC_Common/funk_link.*`.
 - Debug-Tab der Web-UI: CRSF-Zaehler plus Router-Zaehler (weitergeleitet, verworfen) und Warnung bei doppelter Adresse.
 
 ## Router-Regeln
 - A -> B/C: alle gueltigen Frames, ausser Extended-Frames an die eigene Adresse.
 - B/C -> A: alle gueltigen Frames.
 - B <-> C: nie.
+- Funk (Port D, nur Zentrale) wie B/C: Frames von A gehen in den Funk, Antworten aus dem Funk nach A.
 - Frames gehen ganz und unveraendert weiter (CRC geprueft). Je Port eine Warteschlange mit 8 Frames; bei Ueberlauf werden zuerst alte RC-Kanal-Frames verworfen.
 
 ## Stand
 - Aktuelle Version und alle Änderungen: [CHANGELOG.md](../CHANGELOG.md).
-- v5.00 kompiliert für C3, S3 und ESP32 (CI), noch nicht auf Hardware getestet.
+- v5.01 (Funk) kompiliert für C3, S3 und ESP32 (CI), noch nicht auf Hardware getestet.
 - Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
