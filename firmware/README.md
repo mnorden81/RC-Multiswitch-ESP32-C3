@@ -35,7 +35,7 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3, S3 und ab v5.00
 
 ## Stand
 - Aktuelle Version und alle Änderungen: [CHANGELOG.md](../CHANGELOG.md).
-- v5.01 (Funk) kompiliert für C3, S3 und ESP32 (CI), noch nicht auf Hardware getestet.
+- v5.04 kompiliert für C3, S3 und ESP32 (CI). Funk-Teilnehmer (S3) auf Hardware: Kanäle, WM und Lua laufen.
 - Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
