@@ -2,6 +2,9 @@
 
 Gleiche Firmware für alle Platinen, deshalb gleiche Versionsnummern in den Repos RC-Multiswitch-ESP32-C3, RC-Multiswitch-ESP32-S3 und (ab v5.00) ESP32-Multiswitch-Basis_Ziege-One. Die Version wird bei jeder Änderung erhöht, weil sie als CRSF „Parameter Version Number“ an den Sender geht. Neueste Version oben.
 
+## v5.04 (RC_Common 1.5.2)
+- Diagnose WM-Adresse: Reiter „Debug“ zeigt „WM-Befehle empfangen“ und den letzten Befehl (Ziel, Quelle, Code, Befehl, Adresse im Befehl, eigene Adresse, übernommen ja/nein). Damit ist sichtbar, welche Adresse das Widget wirklich schickt. Schaltverhalten unverändert.
+
 ## v5.03 (RC_Common 1.5.2)
 - Fix: WM-Befehle vom Widget schalten wieder bei jeder Modul-Adresse. Seit v4.00 wurden CRSF-Kommandos nur angenommen, wenn sie an die eigene CRSF-Adresse (0xC0 + Modul-Adresse) gingen; das Widget schickt an eine feste Zieladresse, deshalb ging nur Adresse 0. Jetzt wie in der Ziege-One-Firmware: jedes Kommando wird angenommen, gefiltert nach WM-Code und Modul-Adresse im Befehl.
 - Hardware-Test Funk-Teilnehmer mit ESP32_ESP-NOW_CRSF-Link am Empfänger: Kanäle, WM und Lua-Antworten laufen über Funk (fehlendes Lua lag an einem Wackelkontakt der Link-Ader zum Empfänger).

@@ -45,7 +45,7 @@ Board: ESP32-C3 SuperMini
 - **Risiko IO2 (Ausgang 3):** IO2 ist ein Strapping-Pin und muss beim Einschalten HIGH sein. LED3/R3 und der Treiber-Eingang koennen ihn nach LOW ziehen, der C3 startet dann evtl. nicht sicher. Die Platine bleibt so (bereits bestellt). Beim ersten Aufbau mehrmals ein- und ausschalten; Abhilfe siehe [firmware/README.md](firmware/README.md#bekanntes-risiko-c3-io2-ausgang-3-ist-ein-strapping-pin).
 - Footprint ESP32-C3-SuperMini_THT ist eine eigene Zeichnung (2x8, 2,54 mm, Reihenabstand 15,24 mm). Vor der Fertigung 1:1 am echten Board pruefen.
 
-## Firmware (v5.03)
+## Firmware (v5.04)
 - Arduino-Sketch `firmware/RC_Multiswitch`, gleicher Quellcode fuer C3, S3 und den klassischen ESP32 (Platinen Basis/TXRX aus ESP32-Multiswitch-Basis_Ziege-One). Der Chip wird automatisch erkannt, Basis oder TXRX waehlt man in der Web-UI (Karte „Platine“) oder im Lua. Basis: MultiSwitch_ESP32_V3 v3.12.
 - CRSF auf UART A (Werkseinstellung ab v4.07), wahlweise SBUS. UART B (und UART C beim S3) per Lua oder Web-UI auf Aus, CRSF (Modulkette), S.Port, GPS oder Raw einstellbar, mit eigener Baudrate je UART. Beim GPS sucht die Baudrate „Auto“ (Vorgabe) die Rate selbst und stellt das GPS auf 115200 Baud und 10 Hz um, wie bei Betaflight. In der Modulkette ist jedes Modul mit eigener Adresse ueber Lua einzeln einstellbar.
 - Funk ab v5.01 (ESP-NOW): RC-System „CRSF + Funk senden (Zentrale)“ am Modul, das am Empfänger hängt, und „CRSF aus Funk (Teilnehmer)“ an Modulen ohne Kabel zum Empfänger. Kanäle, Lua-Menü und Telemetrie laufen über Funk. Fahrzeug-Kennung und Funkkanal müssen überall gleich sein. Die Funk-Brücke (eigenes Repo ESP32_ESP-NOW_CRSF-Link) passt an jede Seite. Reiter „Funk“ in der Web-UI zeigt die Verbindungsqualität.
@@ -123,12 +123,12 @@ Schlägt das Update fehl, läuft die alte Firmware einfach weiter. Das Modul bei
 
 ## Ordner
 - `hardware/`: KiCad-Projekt (Schaltplan, PCB, PDF, eigene Footprints, fp-lib-table). Entwurfsnotizen in [hardware/README-hardware.md](hardware/README-hardware.md). 3D-druckbares Gehaeuse (stehende oder gewinkelte Stiftleiste) in [hardware/gehaeuse/](hardware/gehaeuse/README.md).
-- `firmware/`: Firmware v5.03 (Arduino-Sketch).
+- `firmware/`: Firmware v5.04 (Arduino-Sketch).
 - `docs/`: Projektbeschreibung, Hardware-Beschreibung und Firmware-Spezifikation.
 
 ## Stand
 - Hardware: Schaltplan und PCB vorhanden. ERC/DRC noch in KiCad ausfuehren.
-- Firmware: v5.03 kompiliert fuer C3, S3 und ESP32 (Basis/TXRX). Funk-Teilnehmer (S3) auf Hardware: Kanaele, WM und Lua laufen.
+- Firmware: v5.04 kompiliert fuer C3, S3 und ESP32 (Basis/TXRX). Funk-Teilnehmer (S3) auf Hardware: Kanaele, WM und Lua laufen.
 
 ## Offene Punkte
 - Pad-Namen und Footprint am realen Board pruefen
