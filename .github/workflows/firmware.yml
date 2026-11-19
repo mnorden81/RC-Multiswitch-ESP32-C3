@@ -20,6 +20,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: RC_Common unveraendert (MANIFEST.sha256)
         run: cd "$RC_COMMON" && sha256sum -c --quiet MANIFEST.sha256
+      # v5.00: Sketch identisch in C3-, S3- und Basis-Repo (gleiche FIRMWARE.sha256)
+      - name: Firmware unveraendert (FIRMWARE.sha256)
+        run: cd firmware/RC_Multiswitch && sha256sum -c --quiet FIRMWARE.sha256
       - name: Host-Tests (CRSF, Rollen, Lua-Menue, LED, Einstellungen)
         run: sh "$RC_COMMON/tests/run_tests.sh"
 
@@ -34,6 +37,9 @@ jobs:
             fqbn: esp32:esp32:esp32c3:CDCOnBoot=cdc
           - board: S3
             fqbn: esp32:esp32:esp32s3:CDCOnBoot=cdc
+          # v5.00: klassischer ESP32 (Platine Basis D1 Mini oder TXRX, Auswahl zur Laufzeit)
+          - board: ESP32
+            fqbn: esp32:esp32:esp32
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-arduino-cli@v2

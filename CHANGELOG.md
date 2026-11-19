@@ -1,6 +1,13 @@
-# Versionsgeschichte RC-Multiswitch (C3 und S3)
+# Versionsgeschichte RC-Multiswitch (C3, S3, ESP32 Basis/TXRX)
 
-Gleiche Firmware für beide Platinen, deshalb gleiche Versionsnummern in den Repos RC-Multiswitch-ESP32-C3 und RC-Multiswitch-ESP32-S3. Die Version wird bei jeder Änderung erhöht, weil sie als CRSF „Parameter Version Number“ an den Sender geht. Neueste Version oben.
+Gleiche Firmware für alle Platinen, deshalb gleiche Versionsnummern in den Repos RC-Multiswitch-ESP32-C3, RC-Multiswitch-ESP32-S3 und (ab v5.00) ESP32-Multiswitch-Basis_Ziege-One. Die Version wird bei jeder Änderung erhöht, weil sie als CRSF „Parameter Version Number“ an den Sender geht. Neueste Version oben.
+
+## v5.00
+- Eine Firmware für alle vier Platinen: C3, S3 und neu der klassische ESP32 mit den Platinen **Basis** (ESP32 D1 Mini) und **TXRX** aus ESP32-Multiswitch-Basis_Ziege-One. Ersetzt dort MultiSwitch_ESP32_V3 und MultiSwitch_ESP32_TXRX (v3.17); V2 bleibt unverändert.
+- Der Chip wird beim Kompilieren erkannt (Board „ESP32 Dev Module“ für Basis/TXRX). Basis oder TXRX wählt man zur Laufzeit: Web-UI Reiter RC-System, Karte „Platine“, oder Lua Global > „Platine (Neustart)“ (Feld 87, NVS `board`, Vorgabe Basis). Die Ausgangspins wechseln nach einem Neustart. Werkseinstellungen lassen die Platine unverändert.
+- Basis/TXRX wie bis v3.17: CRSF/SBUS auf GPIO16/17 (UART2), Status-LED GPIO2, GPIO13 beim Start auf GND = WLAN an. Kein BOOT-Taster (der D1 Mini hat nur Reset), WLAN wie bisher über GPIO13, Web-UI oder Lua. Neu dazu: Lua-Menü mit Ordneransicht, Einstellungs-Backup im Flash. UART B/C sind auf diesen Platinen nicht herausgeführt und werden ausgeblendet.
+- Version in Web-UI und Lua mit Platine, z. B. „v5.00 TXRX“. Karte „Platine“ zeigt Pins, LED und WLAN-Start der aktiven Platine.
+- Gespeicherte Einstellungen aus v3.17 bleiben erhalten (gleicher NVS-Bereich `msw`). CI baut zusätzlich das ESP32-Image.
 
 ## v4.11
 - Baut mit esp32-Core 3.3.x (Arduino IDE): `BOOT_PIN` heißt jetzt `BOOT_BTN_PIN`, weil der neue Core `BOOT_PIN` selbst definiert. CI baut zusätzlich mit 3.3.12.
