@@ -1,5 +1,5 @@
 /*
- * webui.h  –  WiFi-Weboberfläche für RC-Multiswitch C3/S3
+ * webui.h  –  WiFi-Weboberfläche für RC-Multiswitch C3/S3/ESP32 (Basis, TXRX)
  * Konfig 2/3 je Ausgang und die MKan-Gruppen sind nur hier in der Web-UI
  * einstellbar, nicht im Lua-Menü. g_port_role[], g_port_baud[] und
  * g_ports[] stehen in RC_Multiswitch.ino vor dem Include dieser Datei.
@@ -40,7 +40,10 @@ extern uint16_t      channel_output[16];
 extern uint16_t      einkanal_Data;
 extern bool          BUS_OK;
 extern bool          Ausgang[8];
-extern const uint8_t OutPin[8];
+extern uint8_t       OutPin[8];            // v5.00: aus BOARD_OUT_PINS der Platine
+extern uint8_t       g_board;              // v5.00: gewaehlte Platine (NVS "board")
+extern uint8_t       g_board_boot;         // v5.00: beim Start aktive Platine
+extern const char*   boardName();
 extern char          g_wifi_ssid[33];
 extern char          g_wifi_pass[64];
 extern char          g_wifi_ip[16];
@@ -206,6 +209,19 @@ main{max-width:560px;margin:0 auto;padding:20px 14px 60px}
 
   <!-- RC -->
   <div id="tab-rc" style="display:none">
+    <!-- NEU v5.00: Platine (nur klassischer ESP32: Basis D1 Mini oder TXRX) -->
+    <div class="card">
+      <div class="card-title">Platine</div>
+      <div class="row" id="row-board"><label>Platine</label>
+        <select id="sel-board" onchange="onBoardChange()">
+          <option value="0">Basis (D1 Mini, Ausg&auml;nge GPIO 18&ndash;27)</option>
+          <option value="1">TXRX (ULN2803A / TBD62083)</option>
+        </select>
+      </div>
+      <div class="mono" id="board-pins" style="font-size:12px;line-height:1.7;margin-top:4px"></div>
+      <span style="color:var(--sub);font-size:12px;display:block;margin-top:6px" id="board-help"></span>
+      <span style="font-size:12px;display:block;margin-top:6px" id="board-hint"></span>
+    </div>
     <div class="card">
       <div class="card-title">RC-System</div>
 
@@ -369,6 +385,8 @@ main{max-width:560px;margin:0 auto;padding:20px 14px 60px}
     <!-- UART B/C (NEU v4.04): Rolle je Zusatz-UART, wie beim Soundmodul -->
     <div class="card">
       <div class="card-title">UART B/C</div>
+      <div id="portb-none" style="display:none;color:var(--sub);font-size:13px">Auf dieser Platine sind keine Pins f&uuml;r UART B/C herausgef&uuml;hrt.</div>
+      <div id="port-rows">
       <div class="row"><label>UART B</label>
         <select id="sel-portb" onchange="onPortChange()"></select>
       </div>
@@ -384,6 +402,7 @@ main{max-width:560px;margin:0 auto;padding:20px 14px 60px}
       <span style="color:var(--yellow);font-size:12px;display:none;margin-top:6px" id="portc-dup">UART C ist aus: S.Port, GPS und Raw laufen nur auf einem Port.</span>
       <span style="color:var(--sub);font-size:12px;display:block;margin-top:6px">CRSF = Modulkette zum naechsten Modul. S.Port = FrSky LiPo-Sensoren (FLVSS/MLVSS), GPS = NMEA-Empfaenger, Raw = UART offen ohne Auswertung. Beim Wechsel der Rolle wird die passende Baudrate vorgeschlagen. Bei CRSF gehen Zellspannungen und GPS als Telemetrie an den Sender. Wirkt nach einem Neustart.</span>
       <span style="font-size:12px;display:block;margin-top:6px" id="port-hint"></span>
+      </div>
     </div>
   </div>
 
@@ -752,6 +771,25 @@ async function releaseAll(){
   fetchStatus();
 }
 
+// NEU v5.00: Platine. Chip (C3/S3/ESP32) erkennt die Firmware selbst,
+// beim klassischen ESP32 waehlt man hier Basis oder TXRX (wirkt nach Neustart).
+function showBoard(d){
+  $('row-board').style.display=d.board_select?'':'none';
+  if(d.board_select) $('sel-board').value=d.board;
+  const b=d.board_info||{};
+  $('board-pins').innerHTML=`Aktiv: <b>${b.name||'?'}</b> (${b.chip||''})<br>`+
+    `CRSF/SBUS: RX ${b.rx} / TX ${b.tx}<br>Ausg&auml;nge 1&ndash;8: GPIO ${(b.out||[]).join(', ')}<br>`+
+    `Status-LED: ${b.led}<br>WLAN beim Start: ${b.wifi}`;
+  $('board-help').textContent=d.board_select
+    ?'Der Chip wird automatisch erkannt. Basis und TXRX haben denselben Chip, deshalb hier wählen. Die Ausgangspins wechseln nach einem Neustart.'
+    :'Diese Platine erkennt die Firmware automatisch am Chip.';
+}
+async function onBoardChange(){
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({board:parseInt($('sel-board').value)})});
+  $('board-hint').innerHTML='Gespeichert, wirkt nach Neustart. <a href="#" onclick="restartForPorts();return false">Jetzt neu starten</a>';
+}
+
 async function fetchConfig(){
   const d=await api('/api/config');
   if(!d)return;
@@ -787,6 +825,10 @@ async function fetchConfig(){
   $('row-portc').style.display=d.has_portc?'':'none';
   $('row-portc-baud').style.display=d.has_portc?'':'none';
   $('portc-dup').style.display=d.portc_dup?'block':'none';
+  // NEU v5.00: Platine + UART B nur, wenn vorhanden
+  $('portb-none').style.display=d.has_portb===false?'block':'none';
+  $('port-rows').style.display=d.has_portb===false?'none':'';
+  showBoard(d);
   updateRcRows(d.rc_system, ek);
   window._rcBoot=parseInt(d.rc_system);
 }
@@ -1183,7 +1225,7 @@ static const char* rcName(int sys) {
 static void handleStatus() {
     String j = "{";
     // Firmware-Version dynamisch aus Version-Konstante (z.B. 140 -> "v1.40")
-    j += "\"version\":\"v" + String(Version / 100) + "." + String(Version % 100 < 10 ? "0" : "") + String(Version % 100) + "\",";
+    j += "\"version\":\"v" + String(Version / 100) + "." + String(Version % 100 < 10 ? "0" : "") + String(Version % 100) + " " + String(boardName()) + "\",";   // v5.00: mit Platine
     j += "\"bus_ok\":" + String(BUS_OK ? "true" : "false") + ",";
     j += "\"rc_system\":" + String(RC_System_boot) + ",";
   j += "\"rc_system_name\":\"" + webJsonEscape(rcName(RC_System_boot)) + "\",";
@@ -1312,7 +1354,19 @@ static void handleConfig() {
 #else
         j += "\"has_portc\":false,";
 #endif
-        j += "\"portc_dup\":" + String(g_ports[1].duplicate ? "true" : "false");
+        j += "\"portc_dup\":" + String(g_ports[1].duplicate ? "true" : "false") + ",";
+#if defined(UART_B_SERIAL)
+        j += "\"has_portb\":true,";
+#else
+        j += "\"has_portb\":false,";
+#endif
+        // NEU v5.00: Platine (board = gespeicherte Wahl, board_info = aktiv seit Start)
+        j += "\"board\":" + String(g_board) + ",";
+        j += "\"board_select\":" + String(BOARD_SELECTABLE ? "true" : "false") + ",";
+        j += "\"board_info\":{\"name\":\"" + String(boardName()) + "\",\"chip\":\"" BOARD_CHIP "\",";
+        j += "\"rx\":" + String(UART_A_RX) + ",\"tx\":" + String(UART_A_TX) + ",\"out\":[";
+        for (int i = 0; i < 8; i++) { if (i) j += ","; j += String(OutPin[i]); }
+        j += "],\"led\":\"" BOARD_LED_TEXT "\",\"wifi\":\"" BOARD_WIFI_TEXT "\"}";
         j += "}";
         sendJson(j);
         return;
@@ -1323,6 +1377,10 @@ static void handleConfig() {
     bool changed = false;
 
     int v = 0;
+    // NEU v5.00: Platine (nur klassischer ESP32), wirkt nach Neustart
+    if (webJsonInt(body, "board", v) && v >= 0 && v < BOARD_VARIANT_COUNT && v != g_board) {
+      g_board = (uint8_t)v; changed = true;
+    }
     if (webJsonInt(body, "rc_system", v)) {
       v = constrain(v, 0, 4);
       if (v != RC_System) { RC_System = v; changed = true; }
@@ -1651,9 +1709,15 @@ void webui_init() {
     // in der .ino. Default AN, siehe Migrations-Default in nvsLoad().
     // v4.00: WifiPin (GPIO13) entfaellt auf den C3/S3-Platinen.
     // v4.01: Umschalten zur Laufzeit per BOOT-Taster (bootButtonCheck() in der .ino).
+    // v5.00: Basis/TXRX wieder mit GPIO13 (WIFI_BOOT_PIN, beim Start auf GND = AP an).
     if (g_wifi_always_on) {
         webui_enableAP();
     }
+#if defined(WIFI_BOOT_PIN)
+    else if (digitalRead(WIFI_BOOT_PIN) == LOW) {
+        webui_enableAP();
+    }
+#endif
     webServer.on("/",            HTTP_GET,  []{ webServer.send_P(200,"text/html",WEBUI_HTML); });
     webServer.on("/api/status",  HTTP_GET,  handleStatus);
     webServer.on("/api/config",  HTTP_GET,  handleConfig);

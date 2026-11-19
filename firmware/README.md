@@ -1,11 +1,11 @@
 # Firmware RC-Multiswitch
 
-Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis ist MultiSwitch_ESP32_V3 v3.12. Spezifikation: `docs/Firmware-Spezifikation.md`.
+Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3, S3 und ab v5.00 den klassischen ESP32 (Platinen Basis D1 Mini und TXRX, Auswahl zur Laufzeit in der Web-UI-Karte „Platine“ oder Lua Global > „Platine (Neustart)“). Basis ist MultiSwitch_ESP32_V3 v3.12. Spezifikation: `docs/Firmware-Spezifikation.md`.
 
 ## Bauen mit der Arduino IDE
 - Board-Paket: esp32 von Espressif, Version 3.x (getestet im CI mit 3.0.7)
 - Bibliotheken: Bolder Flight Systems SBUS 8.1.4, TinyGPSPlus 1.0.3 (ab v4.04). Alles andere liegt im Sketch unter `src/RC_Common/` (ab v4.05, gemeinsame Basis aller ESP32-Module, siehe `src/RC_Common/README.md`)
-- Board: **ESP32C3 Dev Module** (C3 SuperMini) oder **ESP32S3 Dev Module** (S3-Zero). Das Board wird in `board_config.h` automatisch erkannt.
+- Board: **ESP32C3 Dev Module** (C3 SuperMini), **ESP32S3 Dev Module** (S3-Zero) oder **ESP32 Dev Module** (Basis/TXRX). Das Board wird in `board_config.h` automatisch erkannt.
 - **USB CDC On Boot: Enabled** (sonst bricht der Build mit einer Meldung ab, UART0 wird fuer CRSF/SBUS gebraucht)
 - Partition Scheme: eines mit OTA, z.B. "Default 4MB with spiffs"
 - Fertige .bin-Dateien fuer C3 und S3 erzeugt GitHub Actions bei jedem Push (Artefakte im Workflow "firmware").
@@ -33,7 +33,7 @@ Arduino-Sketch in `RC_Multiswitch/`, gleicher Quellcode fuer C3 und S3. Basis is
 
 ## Stand
 - Aktuelle Version und alle Änderungen: [CHANGELOG.md](../CHANGELOG.md).
-- Kompiliert für C3 und S3 (CI), noch nicht auf Hardware getestet.
+- v5.00 kompiliert für C3, S3 und ESP32 (CI), noch nicht auf Hardware getestet.
 - Offen: Abnahmetest nach [docs/Abnahmepruefung.md](../docs/Abnahmepruefung.md) (Einzelmodul, Kette mit 2 und 3 Modulen).
 
 ## Bekanntes Risiko C3: IO2 (Ausgang 3) ist ein Strapping-Pin
