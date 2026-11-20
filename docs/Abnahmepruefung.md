@@ -151,9 +151,9 @@ VLOAD an CN2 (z. B. 12 V), an jedem Ausgang von J1 ein Testverbraucher. Einschal
 
 | Nr | Prüfung | Erwartet | OK | Notiz |
 | --- | --- | --- | --- | --- |
-| 8.1 | „MultiSwitch@0“ öffnen | Version, Ordner Global, Ausgang 1-8, WLAN, UART B/C | ☐ | |
+| 8.1 | „MultiSwitch@0“ öffnen | Version, Ordner Global, Ausgaenge, WLAN, UART B/C, Funk | ☐ | |
 | 8.2 | Feld Version ablesen | „v4.07 C3“ bzw. „v4.07 S3“ | ☐ | |
-| 8.3 | Ausgang 2: Blink auf Blinken stellen, Web-UI neu laden | Web-UI zeigt dieselbe Einstellung | ☐ | |
+| 8.3 | Ordner Ausgaenge: Ausgang Nr 2 wählen, Blink auf Blinken stellen, Web-UI neu laden | Web-UI zeigt dieselbe Einstellung | ☐ | |
 | 8.4 | Strom aus und an, Lua erneut öffnen | Einstellung aus 8.3 ist noch da | ☐ | |
 | 8.5 | Global „Switch Addr“ auf 1, Geräteliste neu laden | Gerät heißt „MultiSwitch@1“; Widget mit Adresse 1 schaltet, mit Adresse 0 nicht mehr | ☐ | |
 | 8.6 | Adresse zurück auf 0 | wieder „MultiSwitch@0“ | ☐ | |

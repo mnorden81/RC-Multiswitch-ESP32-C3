@@ -2,6 +2,11 @@
 
 Gleiche Firmware für alle Platinen, deshalb gleiche Versionsnummern in den Repos RC-Multiswitch-ESP32-C3, RC-Multiswitch-ESP32-S3 und (ab v5.00) ESP32-Multiswitch-Basis_Ziege-One. Die Version wird bei jeder Änderung erhöht, weil sie als CRSF „Parameter Version Number“ an den Sender geht. Neueste Version oben.
 
+## v5.05 (RC_Common 1.5.2)
+- Lua-Menü kürzer: statt acht Ordnern „Ausgang 1“ bis „Ausgang 8“ mit je 9 Feldern gibt es einen Ordner „Ausgaenge“. Oben wählt „Ausgang Nr“ (1–8) den Ausgang, darunter stehen Name, Quelle, Nr, Blink, AN, AUS, PWM Modus, Festwert und Test für diesen Ausgang. Gleiches Prinzip wie der Ordner „Sounds“ in den Soundmodulen. 34 statt 95 Lua-Felder, das Menü lädt deutlich schneller.
+- Neue Feldnummern: Ausgaenge 5–15, WLAN 16–19, UART B/C 20–24, LED Farbfolge 25, Platine 26, Funk 27–34. Gespeicherte Einstellungen bleiben erhalten (NVS unverändert); der Sender lädt das Menü nach dem Update neu.
+- Web-UI unverändert.
+
 ## v5.04 (RC_Common 1.5.2)
 - Hardware-Test 19.11.2026 bestanden: Multiswitch S3 als Funk-Teilnehmer mit ESP32_ESP-NOW_CRSF-Link v0.2.1 am Empfänger. Kanäle, Lua-Menü und WM-Widget bei jeder Modul-Adresse laufen über Funk.
 - Diagnose WM-Adresse: Reiter „Debug“ zeigt „WM-Befehle empfangen“ und den letzten Befehl (Ziel, Quelle, Code, Befehl, Adresse im Befehl, eigene Adresse, übernommen ja/nein). Damit ist sichtbar, welche Adresse das Widget wirklich schickt. Schaltverhalten unverändert.
