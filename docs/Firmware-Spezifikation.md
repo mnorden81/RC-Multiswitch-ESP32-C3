@@ -134,7 +134,7 @@ Ab v4.10 gilt das gemeinsame Schema aller Module (RC_Common 1.4.0, `status_led.h
 | WLAN an | violett statt grün/rot, Muster bleibt |
 
 - C3: keine steuerbare Status-LED (Onboard-LED IO8 ist UB_RX) → `STATUS_LED_PIN = -1`, Funktion kompiliert aus. Der LED-Pin darf nicht als UART-B-Pin umkonfiguriert werden.
-- S3: WS2812 an IO21 per `neopixelWrite`, Helligkeit niedrig (≤ 20 %). Die LED des S3-Zero erwartet RGB statt GRB; Lua Global > „LED Farbfolge“ (Feld 86, Vorgabe RGB).
+- S3: WS2812 an IO21 per `neopixelWrite`, Helligkeit niedrig (≤ 20 %). Die LED des S3-Zero erwartet RGB statt GRB; Lua Global > „LED Farbfolge“ (Feld 25 ab v5.05, vorher 86; Vorgabe RGB).
 - Aktualisierung nicht blockierend (`millis()`-basiert), unabhängig vom Router.
 
 
