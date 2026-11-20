@@ -135,3 +135,7 @@ Schlägt das Update fehl, läuft die alte Firmware einfach weiter. Das Modul bei
 - Erwaermung des Treibers bei mehreren Kanaelen mit 500 mA pruefen
 - Firmware auf Hardware testen (Einzelmodul und Kette mit 2-3 Modulen)
 - IO2-Strapping (Ausgang 3) beim ersten Aufbau pruefen
+
+## Prüfstand (WebUI und Lua im Browser)
+
+In [`pruefstand/`](pruefstand/) liegt eine Seite, die die echte Weboberfläche und das Lua-Menü dieser Firmware im Browser zeigt (alle Varianten, Modul simuliert): [Prüfstand öffnen](https://raw.githack.com/mnorden81/RC-Multiswitch-ESP32-C3/main/pruefstand/pruefstand.html). Sie wird bei jeder Firmware-Änderung neu gebaut, die GitHub-Prüfung „Prüfstand" achtet darauf.
